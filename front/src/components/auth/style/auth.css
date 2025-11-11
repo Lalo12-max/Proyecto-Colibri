@@ -1,53 +1,65 @@
+/* Tarjetas y formulario auth */
 .auth-card {
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: 22px;
   box-shadow: var(--shadow);
   max-width: 520px;
-  margin: 24px auto;
+  margin: 0;
 }
 
 .auth-title {
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 800;
+  color: #1f2937;
+}
+.auth-subtitle {
+  margin: 0 0 12px 0;
+  color: var(--color-muted);
+  font-size: 13px;
 }
 
 .auth-form {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
+  gap: 12px;
 }
 
 .input-wrap { display: flex; flex-direction: column; gap: 6px; }
 .input-label { font-size: 12px; color: var(--color-muted); }
 
 .auth-input {
-  padding: 10px;
+  padding: 10px 12px;
   border: 1px solid var(--color-border);
   border-radius: 10px;
   outline: none;
   background: #fff;
 }
-
 .auth-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 3px rgba(15, 110, 117, 0.15);
 }
 
 .auth-btn {
-  margin-top: 8px;
+  margin-top: 4px;
   padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: #f4f8f9;
+  color: #1f2937;
+  cursor: pointer;
+}
+.auth-btn:hover { background: #edf6f7; }
+.auth-btn-primary {
   background: var(--color-primary);
   color: var(--color-primary-contrast);
   border: none;
-  border-radius: 10px;
-  cursor: pointer;
 }
 
 .link-btn {
-  margin-top: 12px;
+  margin-top: 10px;
   background: transparent;
   border: none;
   color: var(--color-primary);
@@ -55,3 +67,191 @@
   text-decoration: underline;
   padding: 0;
 }
+
+/* Layout tipo tarjeta dividida inspirada en la imagen */
+.split-auth {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  margin-top: 16px;
+  min-height: 420px;
+}
+
+.split-left,
+.split-right {
+  position: relative;
+  padding: 24px;
+}
+/* Animación de desplazamiento de paneles */
+.split-auth .split-left,
+.split-auth .split-right {
+  transition: transform 420ms ease;
+}
+.split-auth.show-login .split-right { transform: translateX(0); }
+.split-auth.show-register .split-right { transform: translateX(14px); }
+.split-auth.show-login .split-left { transform: translateX(-14px); }
+.split-auth.show-register .split-left { transform: translateX(0); }
+
+.split-left {
+  background: #f07167; /* coral */
+  color: #fff;
+}
+
+.split-right {
+  background: #0e2433; /* navy */
+  color: #cfe3ea;
+}
+/* Imagen sutil en el panel negro para evitar vacío */
+.split-right::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* usa imagen dentro de src: tres niveles arriba desde auth/style/ */
+  background: url('../../../logo.svg') center / 220px no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Pestañas en esquina superior derecha */
+.pill-group {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  left: auto;
+  transform: none;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+.pill-btn {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.pill-btn.active {
+  background: #f07167;
+  color: #fff;
+  border-color: #f07167;
+}
+
+/* Panel y contenido con transición ligera */
+.panel {
+  position: relative;
+  z-index: 3;
+  transition: transform 420ms ease, opacity 320ms ease;
+}
+.split-auth.show-login .split-left .panel { transform: translateX(-20px); opacity: 0.25; }
+.split-auth.show-register .split-right .panel { transform: translateX(20px); opacity: 0.25; }
+.split-auth.show-login .split-right .panel,
+.split-auth.show-register .split-left .panel { transform: translateX(0); opacity: 1; }
+
+/* Cover que “tapa” el panel opuesto */
+.mask {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  transform-origin: center;
+  transform: scaleX(0);
+  transition: transform 420ms ease;
+}
+.coral-mask { background: rgba(240, 113, 103, 0.92); }
+.navy-mask { background: rgba(14, 36, 51, 0.92); }
+
+.split-auth.show-login .split-left .mask { transform: scaleX(1); }
+.split-auth.show-register .split-right .mask { transform: scaleX(1); }
+
+/* Títulos e inputs adaptados por lado */
+.split-form-title {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  margin: 18px 0 6px;
+}
+.split-right .split-form-title { color: #8fb2c0; }
+.split-left .split-form-title { color: rgba(255,255,255,0.85); }
+
+.split-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.25);
+  background: transparent;
+  padding: 10px 2px;
+  outline: none;
+  position: relative;
+  z-index: 2;
+}
+.split-right .split-input {
+  color: #e9f3f6;
+  border-bottom-color: rgba(255,255,255,0.25);
+}
+.split-right .split-input::placeholder { color: rgba(255,255,255,0.55); }
+.split-right .split-input:focus { border-bottom-color: #f07167; box-shadow: 0 1px 0 0 #f07167; }
+
+.split-left .split-input {
+  color: #ffffff;
+  border-bottom-color: rgba(255,255,255,0.75);
+}
+.split-left .split-input::placeholder { color: rgba(255,255,255,0.85); }
+.split-left .split-input:focus { border-bottom-color: #ffffff; box-shadow: 0 1px 0 0 #ffffff; }
+
+/* Botones mejor acomodados */
+.split-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  justify-content: flex-start;
+}
+.split-submit {
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  background: #f07167;
+  color: #fff;
+  cursor: pointer;
+  z-index: 2;
+}
+.split-right .split-submit:hover { background: #f28175; }
+.split-left .split-submit {
+  background: #ffffff;
+  color: #0e2433;
+}
+.split-left .split-submit:hover { background: #f4f6f8; }
+
+/* Color de enlaces por panel */
+.split-right .link-btn { color: #cfe3ea; }
+.split-left .link-btn { color: #ffffff; text-decoration: underline; }
+.split-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #8fb2c0;
+  margin-top: 12px;
+}
+.link-inline { color: #f6a38f; }
+
+.split-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.split-submit {
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  background: #f07167;
+  color: #fff;
+  cursor: pointer;
+}
+.split-submit:hover { background: #f28175; }

@@ -36,10 +36,6 @@ export function BuscarFormulario({ criterios, setCampo, onSolicitar }) {
             onChange={(e) => setCampo('pasajeros', e.target.value)}
           />
         </div>
-
-        <button className="buscar-btn" onClick={() => onSolicitar?.(criterios)}>
-          Solicitar Viaje 🚗
-        </button>
       </div>
     </div>
   );

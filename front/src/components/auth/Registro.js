@@ -1,132 +1,97 @@
 import React from 'react';
 import './style/auth.css';
+import { useAuth } from '../../context/AuthContext';
 
 export function Registro({ onRegistro, goToLogin }) {
-  const [nombre, setNombre] = React.useState('');
-  const [apellidos, setApellidos] = React.useState('');
+  const [nombreCompleto, setNombreCompleto] = React.useState('');
   const [email, setEmail] = React.useState('');
-  const [telefono, setTelefono] = React.useState('');
-  const [fechaNac, setFechaNac] = React.useState('');
+  const [telefono, setTelefono] = React.useState(''); // opcional
+  const [fechaNac, setFechaNac] = React.useState(''); // opcional
   const [error, setError] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const { registerUser } = useAuth();
 
   const crear = async () => {
     setError('');
-    if (!nombre || !apellidos || !email || !telefono || !fechaNac || !password) {
-      setError('Completa todos los campos.');
+    if (!nombreCompleto || !email || !password) {
+      setError('Completa nombre, correo y contraseña.');
       return;
     }
     const emailOk = /\S+@\S+\.\S+/.test(email);
-    const telOk = /^[0-9\s()+-]{7,}$/.test(telefono);
     if (!emailOk) { setError('Correo inválido.'); return; }
-    if (!telOk) { setError('Teléfono inválido.'); return; }
     if (password.length < 8) { setError('La contraseña debe tener al menos 8 caracteres.'); return; }
 
+    // Separar nombre y apellidos desde nombreCompleto
+    const parts = (nombreCompleto || '').trim().split(/\s+/);
+    const nombre = parts.shift() || '';
+    const apellidos = parts.join(' ') || '';
+
     try {
-      const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
-      console.log('[Registro] API_BASE:', API_BASE);
-      const payload = {
+      await registerUser({
         email,
         password,
         nombre,
         apellidos,
-        telefono,
-        fechaNacimiento: fechaNac,
-      };
-      console.log('[Registro] Enviando payload:', payload);
-
-      const resp = await fetch(`${API_BASE}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        telefono, // opcional
+        fechaNacimiento: fechaNac, // opcional
       });
-      console.log('[Registro] Status:', resp.status);
-      const json = await resp.json();
-      console.log('[Registro] Respuesta JSON:', json);
-
-      if (!resp.ok) {
-        setError(json.error || 'Error al registrar.');
-        return;
-      }
-      onRegistro?.({
-        nombre,
-        apellidos,
-        email,
-        telefono,
-        fechaNacimiento: fechaNac,
-      });
+      onRegistro?.({ nombre, apellidos, email, telefono, fechaNacimiento: fechaNac });
       goToLogin?.();
     } catch (e) {
-      console.error('[Registro] Fetch error:', e);
-      setError('Fallo de red o servidor.');
+      setError(e.message || 'Fallo de red o servidor.');
     }
   };
 
   return (
-    <div className="auth-card">
-      <h2 className="auth-title">Crear cuenta</h2>
-      <div className="auth-form">
-        <div className="input-wrap">
-          <label className="input-label">Nombre(s)</label>
-          <input
-            className="auth-input"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            placeholder="Tu nombre"
-          />
-        </div>
-        <div className="input-wrap">
-          <label className="input-label">Apellidos</label>
-          <input
-            className="auth-input"
-            value={apellidos}
-            onChange={(e) => setApellidos(e.target.value)}
-            placeholder="Tus apellidos"
-          />
-        </div>
-        <div className="input-wrap">
-          <label className="input-label">Correo</label>
-          <input
-            className="auth-input"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="tu@correo.com"
-          />
-        </div>
-        <div className="input-wrap">
-          <label className="input-label">Número de teléfono</label>
-          <input
-            className="auth-input"
-            type="tel"
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
-            placeholder="+34 600 000 000"
-          />
-        </div>
-        <div className="input-wrap">
-          <label className="input-label">Fecha de nacimiento</label>
-          <input
-            className="auth-input"
-            type="date"
-            value={fechaNac}
-            onChange={(e) => setFechaNac(e.target.value)}
-          />
-        </div>
-        <div className="input-wrap">
-          <label className="input-label">Contraseña</label>
-          <input
-            className="auth-input"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="********"
-          />
-        </div>
-        <button className="auth-btn" onClick={crear}>Registrarme</button>
-        {error && <div style={{ color: '#dc2626', fontSize: 12 }}>{error}</div>}
+    <div className="split-form-content">
+      <div className="split-form-title">Nombre completo</div>
+      <input
+        className="split-input"
+        value={nombreCompleto}
+        onChange={(e) => setNombreCompleto(e.target.value)}
+        placeholder="Ingresa tu nombre completo"
+      />
+      <div className="split-form-title">Correo</div>
+      <input
+        className="split-input"
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Ingresa tu correo"
+      />
+      {/* NUEVOS CAMPOS VISIBLES */}
+      <div className="split-form-title">Teléfono</div>
+      <input
+        className="split-input"
+        type="tel"
+        value={telefono}
+        onChange={(e) => setTelefono(e.target.value)}
+        placeholder="Ingresa tu teléfono"
+      />
+      <div className="split-form-title">Fecha de nacimiento</div>
+      <input
+        className="split-input"
+        type="date"
+        value={fechaNac}
+        onChange={(e) => setFechaNac(e.target.value)}
+      />
+      {/* FIN NUEVOS CAMPOS */}
+      <div className="split-form-title">Contraseña</div>
+      <input
+        className="split-input"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Ingresa tu contraseña"
+      />
+      <label className="split-check">
+        <input type="checkbox" /> Al crear tu cuenta aceptas <span className="link-inline">Términos y Condiciones</span>
+      </label>
+      <div className="split-actions">
+        <button type="button" className="split-submit" onClick={crear}>Crear cuenta</button>
+        <button className="link-btn" onClick={goToLogin}>Iniciar sesión</button>
       </div>
-      <button className="link-btn" onClick={goToLogin}>Ya tengo cuenta</button>
+      {error && <div style={{ color: '#f87171', fontSize: 12 }}>{error}</div>}
     </div>
   );
 }

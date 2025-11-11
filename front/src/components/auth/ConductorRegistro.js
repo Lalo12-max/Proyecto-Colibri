@@ -1,5 +1,6 @@
 import React from 'react';
 import './style/auth.css';
+import { useAuth } from '../../context/AuthContext';
 
 export function ConductorRegistro({ onRegistro, goToLogin }) {
   const [nombreCompleto, setNombreCompleto] = React.useState('');
@@ -8,65 +9,42 @@ export function ConductorRegistro({ onRegistro, goToLogin }) {
   const [fechaNac, setFechaNac] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState('');
-
-  const crear = async () => {
-    setError('');
-    if (!nombreCompleto || !email || !telefono || !fechaNac || !password) {
-      setError('Completa todos los campos.');
-      return;
-    }
-    const emailOk = /\S+@\S+\.\S+/.test(email);
-    const telOk = /^[0-9\s()+-]{7,}$/.test(telefono);
-    if (!emailOk) { setError('Correo inválido.'); return; }
-    if (!telOk) { setError('Teléfono inválido.'); return; }
-    if (password.length < 8) { setError('La contraseña debe tener al menos 8 caracteres.'); return; }
-
-    try {
-      const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
-      const payload = {
-        nombreCompleto,
-        email,
-        telefono,
-        fechaNacimiento: fechaNac,
-        password,
-      };
-      const resp = await fetch(`${API_BASE}/conductor/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const json = await resp.json();
-      if (!resp.ok) {
-        setError(json.error || 'Error al registrar.');
-        return;
-      }
-      onRegistro?.({
-        nombreCompleto,
-        email,
-        telefono,
-        fechaNacimiento: fechaNac,
-      });
-      goToLogin?.();
-    } catch (e) {
-      setError('Fallo de red o servidor.');
-    }
-  };
+  const { registerDriver } = useAuth();
 
   return (
     <div className="auth-card">
-      <h2 className="auth-title">Registrarte como conductor</h2>
-      <div className="auth-form">
+      <h2 className="auth-title">Crear cuenta de conductor</h2>
+      <div className="auth-subtitle">Completa tus datos para comenzar a conducir.</div>
+      <form
+        className="auth-form"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setError('');
+          try {
+            const res = await registerDriver({
+              nombreCompleto,
+              email,
+              telefono,
+              fechaNacimiento: fechaNac,
+              password,
+            });
+            onRegistro?.(res);
+          } catch (e) {
+            setError(e.message || 'Error en el registro.');
+          }
+        }}
+      >
         <div className="input-wrap">
           <label className="input-label">Nombre completo</label>
-          <input className="auth-input" value={nombreCompleto} onChange={(e) => setNombreCompleto(e.target.value)} placeholder="Tu nombre completo" />
-        </div>
-        <div className="input-wrap">
-          <label className="input-label">Número de teléfono</label>
-          <input className="auth-input" type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="+34 600 000 000" />
+          <input className="auth-input" value={nombreCompleto} onChange={(e) => setNombreCompleto(e.target.value)} placeholder="Tu nombre" />
         </div>
         <div className="input-wrap">
           <label className="input-label">Correo</label>
           <input className="auth-input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" />
+        </div>
+        <div className="input-wrap">
+          <label className="input-label">Teléfono</label>
+          <input className="auth-input" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="+34 600 000 000" />
         </div>
         <div className="input-wrap">
           <label className="input-label">Fecha de nacimiento</label>
@@ -76,9 +54,10 @@ export function ConductorRegistro({ onRegistro, goToLogin }) {
           <label className="input-label">Contraseña</label>
           <input className="auth-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="********" />
         </div>
-        <button className="auth-btn" onClick={crear}>Registrarme</button>
+        <button type="submit" className="auth-btn auth-btn-primary">Crear cuenta</button>
         {error && <div style={{ color: '#dc2626', fontSize: 12 }}>{error}</div>}
-      </div>
+      </form>
+
       <button className="link-btn" onClick={goToLogin}>Ya tengo cuenta</button>
     </div>
   );

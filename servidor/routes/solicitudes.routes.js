@@ -1,0 +1,20 @@
+import { Router } from 'express';
+import {
+  crearSolicitud,
+  listarPendientesConductor,
+  cotizarSolicitud,
+  actualizarEstadoCliente,
+  listarSolicitudesCliente,
+  listarSolicitudesConductorAsignadas,
+} from '../controllers/solicitudes.controller.js';
+
+const router = Router();
+
+router.post('/solicitudes', crearSolicitud);
+router.get('/solicitudes/conductor/:conductorId', listarPendientesConductor);
+router.get('/solicitudes/conductor/:conductorId/mias', listarSolicitudesConductorAsignadas);
+router.patch('/solicitudes/:id/cotizar', cotizarSolicitud);
+router.patch('/solicitudes/:id/estado', actualizarEstadoCliente);
+router.get('/solicitudes/cliente/:email', listarSolicitudesCliente);
+
+export default router;

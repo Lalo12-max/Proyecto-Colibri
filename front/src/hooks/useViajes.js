@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
+
 export function useViajes() {
   const [viajes, setViajes] = useState([]);
   const [viajeSeleccionado, setViajeSeleccionado] = useState(null);
@@ -7,7 +9,7 @@ export function useViajes() {
 
   // Cargar viajes desde el backend
   const recargarViajes = async () => {
-    const resp = await fetch('http://localhost:4000/viajes/disponibles');
+    const resp = await fetch(`${API_BASE}/viajes/disponibles`);
     const data = await resp.json();
     setViajes(Array.isArray(data) ? data : []);
   };

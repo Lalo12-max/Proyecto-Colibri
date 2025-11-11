@@ -1,9 +1,10 @@
+
+import { useAuth } from '../../context/AuthContext';
 export function ConductorPerfil({ conductor }) {
-  // Soporta dos formas:
-  // - Nueva: { user: { email }, profile: { nombreCompleto, telefono, fechaNacimiento } }
-  // - Antigua: { nombreCompleto, email, telefono, fechaNacimiento }
-  const perfil = conductor?.profile ?? conductor;
-  const email = conductor?.user?.email ?? conductor?.email ?? '—';
+  const { driver } = useAuth();
+  const src = conductor || (driver ? { user: driver, profile: { nombreCompleto: driver.nombreCompleto, telefono: driver.telefono, fechaNacimiento: driver.fechaNacimiento } } : null);
+  const perfil = src?.profile ?? src;
+  const email = src?.user?.email ?? src?.email ?? '—';
 
   return (
     <div className="card">

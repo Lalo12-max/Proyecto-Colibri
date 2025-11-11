@@ -11,3 +11,10 @@ if (!url || !anonKey) {
 
 export const supabase = createClient(url, anonKey);
 export const supabaseAdmin = serviceRoleKey ? createClient(url, serviceRoleKey) : null;
+
+// Diagnóstico rápido de configuración (no imprime claves)
+console.log(
+  `[Supabase] url=${url} anonKey=${Boolean(anonKey)} serviceRole=${Boolean(serviceRoleKey)} adminClient=${Boolean(
+    supabaseAdmin
+  )}`
+);

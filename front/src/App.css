@@ -167,6 +167,7 @@
   border-color: var(--color-primary);
 }
 
+/* estilos de logout */
 .logout-btn {
   background: #ef4444;
   color: #ffffff;
@@ -177,30 +178,371 @@
 .logout-btn:hover {
   background: #dc2626;
   border-color: #dc2626;
+}
 
-  margin-left: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--color-border);
+  .menu-toggle {
+    margin-left: auto;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: #fff;
+    color: #333;
+    cursor: pointer;
+  }
+  
+  .dropdown {
+    position: absolute;
+    right: 16px;
+    top: calc(100% + 8px);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 8px;
+    display: none;
+    min-width: 200px;
+    z-index: 100;
+  }
+  
+  .dropdown.open { display: block; }
+  
+  .dropdown-item {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  
+  .dropdown-item:hover {
+    background: var(--color-primary);
+    color: var(--color-primary-contrast);
+  }
+  
+  /* Mantener estilos de botones nav usados en otras pantallas */
+  .nav-btn {
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: #fff;
+    color: #333;
+    cursor: pointer;
+  }
+  
+  .nav-btn.active {
+    background: var(--color-primary);
+    color: var(--color-primary-contrast);
+    border-color: var(--color-primary);
+  }
+  
+  /* Eliminado: estilos del menú inferior */
+  /* Se pueden borrar las reglas .bottom-nav y .nav-inner si existen */
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  
+  .nav-btn {
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: #fff;
+    color: #333;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .nav-btn.active {
+    background: var(--color-primary);
+    color: var(--color-primary-contrast);
+    border-color: var(--color-primary);
+  }
+  
+  /* App.css ahora solo puede contener animaciones u overrides locales */
+  @keyframes slideInLeft {
+    from { transform: translateX(-16px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  @media (max-width: 900px) {
+    .layout.two-col { grid-template-columns: 1fr; }
+    .brand h1 { font-size: 20px; }
+    .switch-group { flex-wrap: wrap; }
+  }
+  
+  /* Títulos secciones */
+  .section-title {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  
+  /* UI base para formularios y tarjetas */
+  .page.container { padding: 16px; }
+  
+  .card {
+    background: var(--color-card, #fff);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: var(--radius, 14px);
+    padding: 16px;
+    box-shadow: var(--shadow, 0 8px 24px rgba(2,21,78,0.08));
+    margin-bottom: 16px;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .input, .select {
+    padding: 10px;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 10px;
+    outline: none;
+    background: #fff;
+  }
+  
+  .input:focus, .select:focus {
+    border-color: var(--color-primary, #2563eb);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+  
+  .btn {
+    padding: 10px 14px;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 10px;
+    background: #fff;
+    color: #0f172a;
+    cursor: pointer;
+  }
+  
+  .btn-primary {
+    background: var(--color-primary, #2563eb);
+    color: var(--color-primary-contrast, #fff);
+    border-color: var(--color-primary, #2563eb);
+  }
+  
+  .list { margin: 0; padding-left: 18px; }
+  .btn-secondary { background: #fff; }
+  
+  .list {
+    margin: 0;
+    padding-left: 18px;
+  }
+
+/* Oculta el menú inferior existente si quedara en DOM por error */
+.bottom-nav { display: none; }
+
+/* Header con botón hamburguesa */
+.menu-header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: #0b5561; /* tono similar al ejemplo */
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+}
+
+.menu-toggle {
+  margin-left: auto;
+  width: 36px;
+  height: 28px;
+  display: grid;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.menu-toggle span {
+  display: block;
+  height: 3px;
   background: #fff;
-  color: #333;
+  border-radius: 2px;
+}
+
+/* Panel desplegable */
+.menu-panel {
+  position: fixed;
+  left: 16px;
+  top: 64px;
+  width: 340px;
+  max-width: 92vw;
+  background: #0b5561;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  padding: 12px 0;
+  transform: translateX(-16px) translateY(-8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 180ms ease, opacity 180ms ease;
+  z-index: 300;
+}
+.menu-panel.open {
+  transform: none;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.menu-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px 8px 16px;
+}
+.menu-title { font-weight: 700; }
+
+.menu-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 18px;
   cursor: pointer;
 }
 
-@keyframes slideInLeft {
-  from { transform: translateX(-16px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+.menu-list { display: grid; }
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  text-decoration: none;
+  color: #fff;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+.menu-item:first-child { border-top: none; }
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.menu-item .icon { width: 24px; text-align: center; }
+
+.page.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 16px;
 }
 
-@media (max-width: 900px) {
-  .layout.two-col { grid-template-columns: 1fr; }
-  .brand h1 { font-size: 20px; }
-  .switch-group { flex-wrap: wrap; }
+.app-header {
+  background: linear-gradient(180deg, rgba(15,110,117,0.09), rgba(15,110,117,0.03));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  box-shadow: var(--shadow);
 }
 
-/* Títulos secciones */
+.app-header .brand h1 {
+  color: var(--color-primary);
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin: 16px 0;
+}
+
 .section-title {
-  margin: 0 0 12px 0;
-  font-size: 20px;
+  margin: 0 0 10px 0;
   font-weight: 700;
+  color: #1f2937;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.input, .select {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  outline: none;
+  background: #fff;
+}
+.input:focus, .select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(15,110,117,0.15);
+}
+
+.btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: #f4f8f9;
+  color: #1f2937;
+  cursor: pointer;
+}
+.btn:hover { background: #edf6f7; }
+.btn-primary { background: var(--color-primary); color: var(--color-primary-contrast); border: none; }
+
+.link-btn { color: var(--color-primary); }
+
+.list { padding-left: 18px; }
+
+/* Layout autenticación */
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (min-width: 860px) {
+  .auth-grid { grid-template-columns: 1.1fr 1fr; }
+}
+
+/* Pestañas */
+.tab-group {
+  display: flex;
+  gap: 8px;
+  background: #f1f6f7;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 6px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #1f2937;
+  cursor: pointer;
+}
+.tab-btn.active {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+.menu-toggle {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.menu-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--color-primary-contrast);
+  margin: 3px 0;
+  border-radius: 1px;
 }

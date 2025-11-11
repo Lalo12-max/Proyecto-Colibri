@@ -164,13 +164,22 @@ export async function actualizarEstadoCliente(req, res) {
   try {
     const { id } = req.params;
     const { estado } = req.body;
-    if (!['aceptada', 'rechazada', 'cancelada', 'completada'].includes(estado)) {
+    const client = supabaseAdmin ?? supabase;
+
+    const estadosStatus = ['pendiente', 'cotizada', 'aceptada', 'rechazada'];
+    const estadosHist = ['pendiente', 'cotizada', 'aceptada', 'rechazada', 'cancelada', 'completada'];
+
+    if (!estadosHist.includes(estado)) {
       return res.status(400).json({ error: 'Estado inválido.' });
     }
-    const client = supabaseAdmin ?? supabase;
+
+    const update = estadosStatus.includes(estado)
+      ? { status: estado }
+      : { estado };
+
     const { data, error } = await client
       .from('solicitudes_viaje')
-      .update({ status: estado })
+      .update(update)
       .eq('id', id)
       .select()
       .single();

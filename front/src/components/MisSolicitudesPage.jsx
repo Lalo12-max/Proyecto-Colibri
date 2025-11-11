@@ -7,6 +7,7 @@ export default function MisSolicitudesPage() {
   const [modo, setModo] = useState(user ? 'cliente' : 'conductor');
   const [items, setItems] = useState([]);
   const [msg, setMsg] = useState('');
+  const [filtro, setFiltro] = useState('');
 
   const cargar = async () => {
     setMsg('');
@@ -34,10 +35,19 @@ export default function MisSolicitudesPage() {
         <button className={`nav-btn ${modo === 'cliente' ? 'active' : ''}`} onClick={() => setModo('cliente')}>Como cliente</button>
         <button className={`nav-btn ${modo === 'conductor' ? 'active' : ''}`} onClick={() => setModo('conductor')}>Como conductor</button>
         <button className="nav-btn" onClick={cargar}>Actualizar</button>
+        <select className="nav-btn" value={filtro} onChange={(e) => setFiltro(e.target.value)}>
+          <option value="">Todos</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="cotizada">Cotizada</option>
+          <option value="aceptada">Aceptada</option>
+          <option value="rechazada">Rechazada</option>
+          <option value="cancelada">Cancelada</option>
+          <option value="completada">Completada</option>
+        </select>
       </div>
       <div style={{ marginTop: 16 }}>
         <ul>
-          {items.map((s) => (
+          {items.filter((s) => !filtro || s.status === filtro).map((s) => (
             <li key={s.id}>
               [{s.status}] {s.origen} → {s.destino} pasajeros={s.pasajeros}
               {s.cliente_nombre ? ` | Cliente: ${s.cliente_nombre}` : s.cliente_email ? ` | Cliente: ${s.cliente_email}` : ''}

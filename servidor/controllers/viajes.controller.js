@@ -87,9 +87,9 @@ export async function listDisponibles(_req, res) {
 
 export async function createPunto(req, res) {
   try {
-    const { conductorId, puntoSalida, plazas } = req.body;
-    if (!conductorId || !puntoSalida || !plazas) {
-      return res.status(400).json({ error: 'Faltan campos: conductorId, puntoSalida, plazas.' });
+    const { conductorId, puntoSalida, plazas, zonaNombre, referenciaTexto, lat, lng, precio_base } = req.body;
+    if (!conductorId || !(puntoSalida || zonaNombre) || !plazas) {
+      return res.status(400).json({ error: 'Faltan campos: conductorId, punto/zona, plazas.' });
     }
 
     const client = supabaseAdmin ?? supabase;
@@ -112,16 +112,20 @@ export async function createPunto(req, res) {
       .insert({
         conductor_id: conductorId,
         conductor_nombre: conductor.nombre_completo,
-        origen: puntoSalida,
+        origen: zonaNombre || puntoSalida,
         destino: 'A definir',
         fecha,
         hora: '00:00',
-        precio: 0,
+        precio: precio_base ? Number(precio_base) : 0,
         plazas_totales: parseInt(plazas, 10),
         plazas_disponibles: parseInt(plazas, 10),
         coche: 'Coche particular',
         matricula: 'No especificada',
-        estado: 'borrador',
+        estado: 'punto',
+        zona_nombre: zonaNombre || null,
+        referencia_texto: referenciaTexto || null,
+        lat: lat ?? null,
+        lng: lng ?? null,
       })
       .select()
       .single();
@@ -131,6 +135,31 @@ export async function createPunto(req, res) {
     }
 
     return res.status(201).json({ ...insertado, rating: 0 });
+  } catch (_e) {
+    return res.status(500).json({ error: 'Error interno de servidor.' });
+  }
+}
+
+export async function listZonas(_req, res) {
+  try {
+    const client = supabaseAdmin ?? supabase;
+    const { data, error } = await client
+      .from('viajes')
+      .select('*')
+      .eq('estado', 'punto')
+      .order('fecha', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    const mapped = (data ?? []).map((v) => ({
+      id: v.id,
+      zonaNombre: v.zona_nombre || v.origen,
+      referenciaTexto: v.referencia_texto || null,
+      lat: v.lat ?? null,
+      lng: v.lng ?? null,
+      plazas: v.plazas_disponibles,
+      conductor: v.conductor_nombre,
+      precio_punto: v.precio,
+    }));
+    return res.json(mapped);
   } catch (_e) {
     return res.status(500).json({ error: 'Error interno de servidor.' });
   }

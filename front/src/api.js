@@ -43,6 +43,7 @@ export const viajes = {
   crearPunto: (payload, token) => request('/puntos', { method: 'POST', body: payload, token }),
   misViajes: (conductorId, estado, token) =>
     request(estado ? `/viajes/conductor/${conductorId}?estado=${encodeURIComponent(estado)}` : `/viajes/conductor/${conductorId}`, { token }),
+  zonas: () => request('/puntos/zonas'),
 };
 
 // Solicitudes
@@ -58,4 +59,8 @@ export const solicitudes = {
     request(`/solicitudes/cliente/${encodeURIComponent(email)}`, { token }),
   delConductor: (driverId, token) =>
     request(`/solicitudes/conductor/${driverId}/mias`, { token }),
+  aceptar: (id, conductorId, token) =>
+    request(`/solicitudes/${id}/aceptar`, { method: 'PATCH', body: { conductorId }, token }),
+  rechazar: (id, token) =>
+    request(`/solicitudes/${id}/rechazar`, { method: 'PATCH', token }),
 };

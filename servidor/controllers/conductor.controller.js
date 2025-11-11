@@ -25,6 +25,7 @@ export async function registerConductor(req, res) {
     }
 
     const client = supabaseAdmin ?? supabase;
+    const password_hash = await bcrypt.hash(password, 10);
     const { error: insertError } = await client
       .from('conductores')
       .insert({
@@ -33,6 +34,7 @@ export async function registerConductor(req, res) {
         telefono,
         email,
         fecha_nacimiento: fechaNacimiento,
+        password_hash,
       });
 
     if (insertError) {
@@ -127,9 +129,10 @@ export const registerDriver = async (req, res) => {
 
     const authUserId = created.user?.id;
 
+    const password_hash = await bcrypt.hash(password, 10);
     const { error: perfilErr } = await supabase
         .from('conductores')
-        .insert({ id: authUserId, email, nombre, licencia })
+        .insert({ id: authUserId, email, nombre, licencia, password_hash })
         .select()
         .single();
 

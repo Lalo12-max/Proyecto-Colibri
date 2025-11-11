@@ -37,6 +37,16 @@ export async function crearSolicitud(req, res) {
   }
 }
 
+function calcularPrecio({ origen, destino, pasajeros, tipo }) {
+  const base = 50;
+  const minimo = 25;
+  const porPasajero = 5;
+  let precio = base + porPasajero * (parseInt(pasajeros, 10) || 1);
+  if (precio < minimo) precio = minimo;
+  if (tipo === 'punto') precio = Math.max(minimo, Math.round(precio * 0.2));
+  return precio;
+}
+
 export async function listarPendientesConductor(req, res) {
   try {
     const client = supabaseAdmin ?? supabase;
@@ -90,11 +100,71 @@ export async function cotizarSolicitud(req, res) {
   }
 }
 
+export async function aceptarSolicitud(req, res) {
+  try {
+    const { id } = req.params;
+    const { conductorId } = req.body;
+    if (!conductorId) return res.status(400).json({ error: 'Faltan campos.' });
+    const client = supabaseAdmin ?? supabase;
+
+    const { data: s, error: sErr } = await client
+      .from('solicitudes_viaje')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (sErr || !s) return res.status(404).json({ error: 'Solicitud no encontrada.' });
+    if (s.status !== 'pendiente' && s.status !== 'cotizada') {
+      return res.status(400).json({ error: 'Estado no permite aceptación.' });
+    }
+
+    const precio = calcularPrecio({ origen: s.origen, destino: s.destino, pasajeros: s.pasajeros, tipo: 'solicitud' });
+
+    const { data, error } = await client
+      .from('solicitudes_viaje')
+      .update({ conductor_id: conductorId, precio, status: 'aceptada' })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) return res.status(500).json({ error: error.message });
+
+    let conductor_nombre = null;
+    if (data?.conductor_id) {
+      const { data: c } = await client
+        .from('conductores')
+        .select('nombre_completo')
+        .eq('id', data.conductor_id)
+        .single();
+      if (c) conductor_nombre = c.nombre_completo;
+    }
+
+    return res.json({ ...data, conductor_nombre });
+  } catch (_e) {
+    return res.status(500).json({ error: 'Error interno de servidor.' });
+  }
+}
+
+export async function rechazarSolicitud(req, res) {
+  try {
+    const { id } = req.params;
+    const client = supabaseAdmin ?? supabase;
+    const { data, error } = await client
+      .from('solicitudes_viaje')
+      .update({ status: 'rechazada' })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) return res.status(500).json({ error: error.message });
+    return res.json(data);
+  } catch (_e) {
+    return res.status(500).json({ error: 'Error interno de servidor.' });
+  }
+}
+
 export async function actualizarEstadoCliente(req, res) {
   try {
     const { id } = req.params;
     const { estado } = req.body;
-    if (!['aceptada', 'rechazada'].includes(estado)) {
+    if (!['aceptada', 'rechazada', 'cancelada', 'completada'].includes(estado)) {
       return res.status(400).json({ error: 'Estado inválido.' });
     }
     const client = supabaseAdmin ?? supabase;

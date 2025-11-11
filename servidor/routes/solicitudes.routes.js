@@ -3,6 +3,8 @@ import {
   crearSolicitud,
   listarPendientesConductor,
   cotizarSolicitud,
+  aceptarSolicitud,
+  rechazarSolicitud,
   actualizarEstadoCliente,
   listarSolicitudesCliente,
   listarSolicitudesConductorAsignadas,
@@ -14,6 +16,8 @@ router.post('/solicitudes', crearSolicitud);
 router.get('/solicitudes/conductor/:conductorId', listarPendientesConductor);
 router.get('/solicitudes/conductor/:conductorId/mias', listarSolicitudesConductorAsignadas);
 router.patch('/solicitudes/:id/cotizar', cotizarSolicitud);
+router.patch('/solicitudes/:id/aceptar', aceptarSolicitud);
+router.patch('/solicitudes/:id/rechazar', rechazarSolicitud);
 router.patch('/solicitudes/:id/estado', actualizarEstadoCliente);
 router.get('/solicitudes/cliente/:email', listarSolicitudesCliente);
 

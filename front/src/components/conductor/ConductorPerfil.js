@@ -14,6 +14,11 @@ export function ConductorPerfil({ conductor }) {
         <div><strong>Correo:</strong> {email}</div>
         <div><strong>Teléfono:</strong> {perfil?.telefono ?? '—'}</div>
         <div><strong>Fecha de nacimiento:</strong> {perfil?.fechaNacimiento ?? '—'}</div>
+        <div><strong>INE:</strong> {perfil?.ine ?? '—'}</div>
+        <div><strong>Licencia de conducir:</strong> {perfil?.licencia ?? '—'}</div>
+        <div><strong>Tarjeta de circulación:</strong> {perfil?.tarjetaCirculacion ?? '—'}</div>
+        <div><strong>Seguro del vehículo:</strong> {perfil?.seguro ?? '—'}</div>
+        <div><strong>Cuenta bancaria:</strong> {perfil?.cuentaBancaria ?? '—'}</div>
       </div>
     </div>
   );

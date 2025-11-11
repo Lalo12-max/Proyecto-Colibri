@@ -72,6 +72,30 @@ export default function SolicitudesPage() {
     }
   };
 
+  const aceptar = async (id) => {
+    setMsg('');
+    try {
+      const token = getDriverToken();
+      const res = await solicitudes.aceptar(id, getDriverId(), token);
+      setMsg(`Aceptada id=${res.id} precio=${res.precio}`);
+      cargarPendientes();
+    } catch (err) {
+      setMsg(`Error: ${err.message}`);
+    }
+  };
+
+  const rechazar = async (id) => {
+    setMsg('');
+    try {
+      const token = getDriverToken();
+      const res = await solicitudes.rechazar(id, token);
+      setMsg(`Rechazada id=${res.id}`);
+      cargarPendientes();
+    } catch (err) {
+      setMsg(`Error: ${err.message}`);
+    }
+  };
+
   const doActualizar = async (e) => {
     e.preventDefault();
     setMsg('');
@@ -137,6 +161,10 @@ export default function SolicitudesPage() {
               {pendientes.map((s) => (
                 <li key={s.id}>
                   [{s.status}] {s.origen} → {s.destino} pasajeros={s.pasajeros} cliente={s.cliente_email}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+                    <button className="btn btn-primary" onClick={() => aceptar(s.id)}>Aceptar</button>
+                    <button className="btn btn-secondary" onClick={() => rechazar(s.id)}>Rechazar</button>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -154,7 +182,9 @@ export default function SolicitudesPage() {
               <input className="input" placeholder="solicitudId" value={actualizar.id} onChange={(e) => setActualizar({ ...actualizar, id: e.target.value })} />
               <select className="select" value={actualizar.estado} onChange={(e) => setActualizar({ ...actualizar, estado: e.target.value })}>
                 <option value="aceptada">aceptada</option>
+                <option value="cancelada">cancelada</option>
                 <option value="rechazada">rechazada</option>
+                <option value="completada">completada</option>
               </select>
               <button type="submit" className="btn btn-primary">Actualizar</button>
             </form>

@@ -25,9 +25,11 @@ export function AuthProvider({ children }) {
 
   const loginUser = async (email, password) => {
     const res = await authUser.login({ email, password });
-    setUser(res.user);
+    const u = res.user || res.usuario || res;
+    const merged = { ...u, profile: res.profile || u.profile || null };
+    setUser(merged);
     setUserSession(res.session || null);
-    localStorage.setItem('colibri:user', JSON.stringify(res.user));
+    localStorage.setItem('colibri:user', JSON.stringify(merged));
     localStorage.setItem('colibri:userSession', JSON.stringify(res.session || null));
     return res;
   };
@@ -46,9 +48,11 @@ export function AuthProvider({ children }) {
 
   const loginDriver = async (email, password) => {
     const res = await authDriver.login({ email, password });
-    setDriver(res.user);
+    const d = res.user || res.conductor || res;
+    const merged = { ...d, profile: res.profile || d.profile || null };
+    setDriver(merged);
     setDriverSession(res.session || null);
-    localStorage.setItem('colibri:driver', JSON.stringify(res.user));
+    localStorage.setItem('colibri:driver', JSON.stringify(merged));
     localStorage.setItem('colibri:driverSession', JSON.stringify(res.session || null));
     return res;
   };

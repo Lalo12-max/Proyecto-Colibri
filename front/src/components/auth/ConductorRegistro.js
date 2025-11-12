@@ -12,11 +12,11 @@ export function ConductorRegistro({ onRegistro, goToLogin }) {
   const { registerDriver } = useAuth();
 
   return (
-    <div className="auth-card">
-      <h2 className="auth-title">Crear cuenta de conductor</h2>
+    <div>
+      <h2 className="auth-title split-form-title">Crear cuenta de conductor</h2>
       <div className="auth-subtitle">Completa tus datos para comenzar a conducir.</div>
       <form
-        className="auth-form"
+        className="split-form-content"
         onSubmit={async (e) => {
           e.preventDefault();
           setError('');
@@ -36,29 +36,35 @@ export function ConductorRegistro({ onRegistro, goToLogin }) {
       >
         <div className="input-wrap">
           <label className="input-label">Nombre completo</label>
-          <input className="auth-input" value={nombreCompleto} onChange={(e) => setNombreCompleto(e.target.value)} placeholder="Tu nombre" />
+          <input className="split-input" value={nombreCompleto} onChange={(e) => setNombreCompleto(e.target.value)} placeholder="Tu nombre" />
         </div>
         <div className="input-wrap">
           <label className="input-label">Correo</label>
-          <input className="auth-input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" />
+          <input className="split-input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" />
         </div>
         <div className="input-wrap">
           <label className="input-label">Teléfono</label>
-          <input className="auth-input" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="+34 600 000 000" />
+          <input className="split-input" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="+34 600 000 000" />
         </div>
         <div className="input-wrap">
           <label className="input-label">Fecha de nacimiento</label>
-          <input className="auth-input" type="date" value={fechaNac} onChange={(e) => setFechaNac(e.target.value)} />
+          <input className="split-input" type="date" value={fechaNac} onChange={(e) => setFechaNac(e.target.value)} />
         </div>
         <div className="input-wrap">
           <label className="input-label">Contraseña</label>
-          <input className="auth-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="********" />
+          <input className="split-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="********" />
         </div>
-        <button type="submit" className="auth-btn auth-btn-primary">Crear cuenta</button>
-        {error && <div style={{ color: '#dc2626', fontSize: 12 }}>{error}</div>}
+        <div className="split-actions">
+          <button type="submit" className="split-submit">Crear cuenta</button>
+          <div className="link-row">
+        <button className="link-btn" onClick={goToLogin}>Ya tengo cuenta</button>
+      </div>
+          {error && <div style={{ color: 'var(--color-accent)', fontSize: 12 }}>{error}</div>}
+        </div>
       </form>
-
-      <button className="link-btn" onClick={goToLogin}>Ya tengo cuenta</button>
+      
     </div>
+
+    
   );
 }

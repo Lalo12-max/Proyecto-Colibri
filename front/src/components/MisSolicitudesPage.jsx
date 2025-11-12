@@ -9,24 +9,24 @@ export default function MisSolicitudesPage() {
   const [msg, setMsg] = useState('');
   const [filtro, setFiltro] = useState('');
 
-  const cargar = async () => {
+  useEffect(() => {
     setMsg('');
-    try {
-      if (modo === 'cliente' && user) {
-        const token = getUserToken();
-        const data = await solicitudes.listarCliente(getUserEmail(), token);
-        setItems(data);
-      } else if (modo === 'conductor' && driver) {
-        const token = getDriverToken();
-        const data = await solicitudes.delConductor(getDriverId(), token);
-        setItems(data);
+    (async () => {
+      try {
+        if (modo === 'cliente' && user) {
+          const token = getUserToken();
+          const data = await solicitudes.listarCliente(getUserEmail(), token);
+          setItems(data);
+        } else if (modo === 'conductor' && driver) {
+          const token = getDriverToken();
+          const data = await solicitudes.delConductor(getDriverId(), token);
+          setItems(data);
+        }
+      } catch (err) {
+        setMsg(`Error: ${err.message}`);
       }
-    } catch (err) {
-      setMsg(`Error: ${err.message}`);
-    }
-  };
-
-  useEffect(() => { cargar(); }, [modo, user, driver]);
+    })();
+  }, [modo, user, driver, getUserToken, getUserEmail, getDriverToken, getDriverId]);
 
   return (
     <div className="page container">
@@ -34,7 +34,24 @@ export default function MisSolicitudesPage() {
       <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
         <button className={`nav-btn ${modo === 'cliente' ? 'active' : ''}`} onClick={() => setModo('cliente')}>Como cliente</button>
         <button className={`nav-btn ${modo === 'conductor' ? 'active' : ''}`} onClick={() => setModo('conductor')}>Como conductor</button>
-        <button className="nav-btn" onClick={cargar}>Actualizar</button>
+        <button className="nav-btn" onClick={() => {
+          setMsg('');
+          (async () => {
+            try {
+              if (modo === 'cliente' && user) {
+                const token = getUserToken();
+                const data = await solicitudes.listarCliente(getUserEmail(), token);
+                setItems(data);
+              } else if (modo === 'conductor' && driver) {
+                const token = getDriverToken();
+                const data = await solicitudes.delConductor(getDriverId(), token);
+                setItems(data);
+              }
+            } catch (err) {
+              setMsg(`Error: ${err.message}`);
+            }
+          })();
+        }}>Actualizar</button>
         <select className="nav-btn" value={filtro} onChange={(e) => setFiltro(e.target.value)}>
           <option value="">Todos</option>
           <option value="pendiente">Pendiente</option>

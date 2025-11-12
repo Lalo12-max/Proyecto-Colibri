@@ -2,7 +2,7 @@
 import { useAuth } from '../../context/AuthContext';
 export function ConductorPerfil({ conductor }) {
   const { driver } = useAuth();
-  const src = conductor || (driver ? { user: driver, profile: { nombreCompleto: driver.nombreCompleto, telefono: driver.telefono, fechaNacimiento: driver.fechaNacimiento } } : null);
+  const src = conductor || driver || null;
   const perfil = src?.profile ?? src;
   const email = src?.user?.email ?? src?.email ?? '—';
 

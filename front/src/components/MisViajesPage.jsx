@@ -1,27 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { viajes as viajesApi } from '../api';
-import { ListaViajes } from './viajes/ListaViajes';
+import { solicitudes as solicitudesApi } from '../api';
 
 export default function MisViajesPage() {
   const { driver, getDriverId, getDriverToken } = useAuth();
-  const [estado, setEstado] = useState('');
   const [misViajes, setMisViajes] = useState([]);
   const [msg, setMsg] = useState('');
 
-  const cargar = async () => {
+  useEffect(() => {
+    if (!driver) return;
     setMsg('');
-    try {
-      const token = getDriverToken();
-      const did = getDriverId();
-      const data = await viajesApi.misViajes(did, estado, token);
-      setMisViajes(data);
-    } catch (err) {
-      setMsg(`Error: ${err.message}`);
-    }
-  };
-
-  useEffect(() => { if (driver) cargar(); }, [driver, estado]);
+    (async () => {
+      try {
+        const token = getDriverToken();
+        const did = getDriverId();
+        const data = await solicitudesApi.delConductor(did, token);
+        const viajes = (Array.isArray(data) ? data : []).filter((s) => s.status === 'aceptada' || s.status === 'completada');
+        setMisViajes(viajes);
+      } catch (err) {
+        setMsg(`Error: ${err.message}`);
+      }
+    })();
+  }, [driver, getDriverToken, getDriverId]);
 
   if (!driver) return <div className="page container">Inicia sesión como conductor.</div>;
 
@@ -31,18 +31,30 @@ export default function MisViajesPage() {
 
       <div className="card" style={{ marginTop: 12 }}>
         <div className="form-grid">
-          <select className="select" value={estado} onChange={(e) => setEstado(e.target.value)}>
-            <option value="">Todos</option>
-            <option value="activo">Activos</option>
-            <option value="borrador">Borradores</option>
-          </select>
-          <button className="btn" onClick={cargar}>Actualizar</button>
+          <button className="btn" onClick={() => {
+            setMsg('');
+            (async () => {
+              try {
+                const token = getDriverToken();
+                const did = getDriverId();
+                const data = await solicitudesApi.delConductor(did, token);
+                const viajes = (Array.isArray(data) ? data : []).filter((s) => s.status === 'aceptada' || s.status === 'completada');
+                setMisViajes(viajes);
+              } catch (err) {
+                setMsg(`Error: ${err.message}`);
+              }
+            })();
+          }}>Actualizar</button>
         </div>
       </div>
 
       <div className="card">
         <h3 className="section-title">Listado</h3>
-        <ListaViajes viajes={misViajes} onSeleccionarViaje={() => {}} />
+        <ul className="list" style={{ marginTop: 12 }}>
+          {misViajes.map((s) => (
+            <li key={s.id}>[{s.status}] {s.origen} → {s.destino} pasajeros={s.pasajeros} cliente={s.cliente_email}</li>
+          ))}
+        </ul>
       </div>
 
       {msg && <div style={{ marginTop: 12, color: 'var(--color-muted)' }}>{msg}</div>}

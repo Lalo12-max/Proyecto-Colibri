@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { viajes } from '../api';
+import { ListaViajes } from './viajes/ListaViajes';
 
 export default function ViajesPage() {
   const { user, getUserToken, driver, getDriverToken, getUserId, getDriverId } = useAuth();
@@ -121,21 +122,77 @@ export default function ViajesPage() {
       </div>
 
       <section className="card">
-        <h3 className="section-title">Disponibles</h3>
-        <button className="btn" onClick={cargarDisponibles}>Recargar</button>
-        <ul className="list" style={{ marginTop: 12 }}>
-          {disponibles.map((v) => (
-            <li key={v.id}>
-              {v.from} → {v.to} | {v.date} {v.time} | {v.seats} plazas | {v.price}€ | Conductor: {v.driver}
-            </li>
-          ))}
-        </ul>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h3 className="section-title" style={{ margin: 0 }}>Disponibles</h3>
+          <span style={{ padding: '4px 10px', borderRadius: 20, fontSize: 12, background: 'var(--color-card)', border: '1px solid var(--color-border)', color: 'var(--color-muted)' }}>
+            {disponibles.length} viajes
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+          <button className="btn" onClick={cargarDisponibles}>Recargar</button>
+        </div>
+        <div style={{ marginTop: 16 }}>
+          <ListaViajes viajes={disponibles} onSeleccionarViaje={() => {}} />
+        </div>
       </section>
+      {false && (
+      <section className="card" style={{ marginTop: 16 }}>
+        <h3 className="section-title">Catálogo por fecha</h3>
+        <div className="form-grid">
+          <select
+            className="select"
+            value={fechaCatalogo}
+            onChange={(e) => setFechaCatalogo(e.target.value)}
+          >
+            <option value="">Todas</option>
+            {(catalogo.fechas || []).map((f) => (
+              <option key={f} value={f}>{f}</option>
+            ))}
+          </select>
+          <button className="btn" onClick={cargarCatalogo}>Recargar catálogo</button>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          {(fechaCatalogo ? (catalogo.catalogo[fechaCatalogo] || []) : (catalogo.fechas || []).flatMap((f) => catalogo.catalogo[f] || [])).length === 0 ? (
+            <div>No hay viajes en el catálogo para la selección</div>
+          ) : (
+            <ul className="list">
+              {(fechaCatalogo ? (catalogo.catalogo[fechaCatalogo] || []) : (catalogo.fechas || []).flatMap((f) => catalogo.catalogo[f] || [])).map((v) => (
+                <li key={v.id}>
+                  {v.from} → {v.to} | {v.time} | {v.seats} plazas | {v.price}€ | Conductor: {v.driver}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+      )}
 
-      
-
-      
-
+      {false && (
+      <section className="card" style={{ marginTop: 16 }}>
+        <h3 className="section-title">Crear viaje (conductor)</h3>
+        {driver ? (
+          <form onSubmit={crearViaje} className="form-grid">
+            <input className="input" placeholder="conductorId" value={nuevoViaje.conductorId || ''} readOnly />
+            <input className="input" placeholder="origen" value={nuevoViaje.origen} onChange={(e) => setNuevoViaje({ ...nuevoViaje, origen: e.target.value })} />
+            <input className="input" placeholder="destino" value={nuevoViaje.destino} onChange={(e) => setNuevoViaje({ ...nuevoViaje, destino: e.target.value })} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <input className="input" placeholder="fecha (YYYY-MM-DD)" value={nuevoViaje.fecha} onChange={(e) => setNuevoViaje({ ...nuevoViaje, fecha: e.target.value })} />
+              <input className="input" placeholder="hora (HH:MM)" value={nuevoViaje.hora} onChange={(e) => setNuevoViaje({ ...nuevoViaje, hora: e.target.value })} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <input className="input" placeholder="precio" value={nuevoViaje.precio} onChange={(e) => setNuevoViaje({ ...nuevoViaje, precio: e.target.value })} />
+              <input className="input" placeholder="plazas" value={nuevoViaje.plazas} onChange={(e) => setNuevoViaje({ ...nuevoViaje, plazas: e.target.value })} />
+            </div>
+            <input className="input" placeholder="coche (opcional)" value={nuevoViaje.coche} onChange={(e) => setNuevoViaje({ ...nuevoViaje, coche: e.target.value })} />
+            <input className="input" placeholder="matricula (opcional)" value={nuevoViaje.matricula} onChange={(e) => setNuevoViaje({ ...nuevoViaje, matricula: e.target.value })} />
+            <button type="submit" className="btn btn-primary">Publicar viaje</button>
+          </form>
+        ) : (
+          <div>Inicia sesión de conductor para publicar un viaje.</div>
+        )}
+      </section>
+      )}
+      {false && (
       <section className="card" style={{ marginTop: 16 }}>
         <h3 className="section-title">Crear punto (conductor)</h3>
         {driver ? (
@@ -194,7 +251,9 @@ export default function ViajesPage() {
           <div>Inicia sesión de conductor para crear punto.</div>
         )}
       </section>
+      )}
 
+      {false && (
       <section className="card" style={{ marginTop: 16 }}>
         <h3 className="section-title">Mis puntos (conductor)</h3>
         {driver ? (
@@ -217,6 +276,7 @@ export default function ViajesPage() {
           <div>Inicia sesión de conductor para ver tus puntos.</div>
         )}
       </section>
+      )}
 
       {msg && <div style={{ marginTop: 16, color: 'var(--color-muted)' }}>{msg}</div>}
     </div>

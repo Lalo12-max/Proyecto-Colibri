@@ -1,76 +1,50 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { ConductorLogin } from './auth/ConductorLogin';
 import { ConductorRegistro } from './auth/ConductorRegistro';
 
 export default function DriverAuthPage() {
-  const { driver, driverSession, logoutDriver } = useAuth();
-  const [view, setView] = useState('login');
+  const [view, setView] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const v = params.get('view');
+      return v === 'registro' ? 'registro' : 'login';
+    } catch { return 'login'; }
+  });
 
   return (
     <div className="page container">
       <div className="app-header"><div className="brand"><h1>Conductor</h1></div></div>
 
-      <div className="card">
-        {driver ? (
-          <div>
-            <div>Sesión activa: {driver?.nombreCompleto || driver?.email}</div>
-            <div style={{ color: 'var(--color-muted)', fontSize: 12 }}>Conectado</div>
-            <button className="btn" onClick={logoutDriver}>Cerrar sesión</button>
-          </div>
-        ) : (
-          <div>No hay sesión de conductor</div>
-        )}
-      </div>
+      {/* Pantalla de autenticación de conductor, sin controles de cerrar sesión (se mueve al menú) */}
 
-      {/* Layout en dos columnas con pestañas */}
-      <div className="auth-grid">
-        {/* Panel informativo */}
-        <div>
-          <div className="card">
-            <h2 className="section-title">¿Quieres conducir en Colibrí?</h2>
-            <div style={{ color: 'var(--color-muted)', marginBottom: 12 }}>
-              Regístrate y publica tus viajes. Gana dinero moviendo personas de forma segura.
-            </div>
-            {/* Muestra requisitos como guía visual */}
-            {/* Puedes esconder este bloque si ya tienes sesión */}
-          </div>
-          {/* Requisitos en su propia tarjeta */}
-          <div className="card" style={{ marginTop: 12 }}>
-            <h3 className="section-title">Requisitos</h3>
-            <div style={{ display: 'grid', gap: 8, textAlign: 'left' }}>
-              <div>INE vigente • Licencia • Seguro • Mantenimiento • Cuenta bancaria</div>
-              <div style={{ fontSize: 12, color: 'var(--color-muted)' }}>
-                Esta sección es demostrativa, no guarda información en la base de datos.
-              </div>
-            </div>
+      {/* Mismo diseño split que la pantalla de Usuario */}
+      <div className={`split-auth ${view === 'login' ? 'show-login' : 'show-register'}`}>
+        {/* Máscara animada */}
+        <div className={`moving-mask ${view === 'login' ? 'pos-left' : 'pos-right'}`}></div>
+
+        {/* Contenido sobre la máscara */}
+        <div className={`mask-content ${view === 'login' ? 'pos-left' : 'pos-right'}`}>
+          <h2 className="mask-title">{view === 'login' ? '¡Bienvenido de vuelta!' : '¡Encantado de verte!'}</h2>
+          <p className="mask-subtitle">
+            {view === 'login'
+              ? 'Accede para publicar viajes y gestionar tus reservas.'
+              : 'Crea tu cuenta de conductor para publicar viajes.'}
+          </p>
+        </div>
+
+        {/* Panel izquierdo: Registro de conductor */}
+        <div className="split-left">
+          <div className="panel">
+            <h2 className="split-side-title">Registrarte como conductor</h2>
+            <ConductorRegistro goToLogin={() => setView('login')} />
           </div>
         </div>
 
-        {/* Panel de autenticación con pestañas */}
-        <div>
-          <div className="card" style={{ marginBottom: 12 }}>
-            <div className="tab-group">
-              <button
-                className={`tab-btn ${view === 'login' ? 'active' : ''}`}
-                onClick={() => setView('login')}
-              >
-                Iniciar sesión
-              </button>
-              <button
-                className={`tab-btn ${view === 'registro' ? 'active' : ''}`}
-                onClick={() => setView('registro')}
-              >
-                Registrarte
-              </button>
-            </div>
-          </div>
-
-          {view === 'registro' ? (
-            <ConductorRegistro goToLogin={() => setView('login')} />
-          ) : (
+        {/* Panel derecho: Login de conductor */}
+        <div className="split-right">
+          <div className="panel">
             <ConductorLogin goToRegistro={() => setView('registro')} />
-          )}
+          </div>
         </div>
       </div>
     </div>

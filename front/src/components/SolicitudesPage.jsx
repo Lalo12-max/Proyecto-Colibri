@@ -1,42 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { solicitudes } from '../api';
 
-export default function SolicitudesPage() {
-  const { user, driver, getUserToken, getDriverToken, getUserId, getUserEmail, getDriverId } = useAuth();
-  const [crear, setCrear] = useState({
-    clienteId: '',
-    clienteEmail: '',
-    origen: '',
-    destino: '',
-    pasajeros: '',
-  });
+export default function SolicitudesPage({ mode = 'cliente' }) {
+  const { user, driver, getUserToken, getDriverToken, getUserEmail, getDriverId } = useAuth();
   const [clienteEmailHist, setClienteEmailHist] = useState('');
   const [historial, setHistorial] = useState([]);
   const [pendientes, setPendientes] = useState([]);
-  const [cotizar, setCotizar] = useState({ id: '', conductorId: '', precio: '' });
-  const [actualizar, setActualizar] = useState({ id: '', estado: 'aceptada' });
   const [msg, setMsg] = useState('');
 
-  const doCrear = async (e) => {
-    e.preventDefault();
-    setMsg('');
-    try {
-      const token = getUserToken();
-      const payload = {
-        ...crear,
-        clienteId: getUserId(),
-        clienteEmail: getUserEmail(),
-        pasajeros: Number(crear.pasajeros),
-      };
-      await solicitudes.crear(payload, token);
-      setMsg(`Solicitud creada: ${payload.origen} → ${payload.destino} para ${payload.pasajeros} pasajero(s).`);
-    } catch (err) {
-      setMsg(`Error: ${err.message}`);
-    }
-  };
 
-  const cargarHistorial = async () => {
+  const cargarHistorial = useCallback(async () => {
     setMsg('');
     try {
       const token = getUserToken();
@@ -45,9 +19,9 @@ export default function SolicitudesPage() {
     } catch (err) {
       setMsg(`Error: ${err.message}`);
     }
-  };
+  }, [getUserToken, getUserEmail, clienteEmailHist]);
 
-  const cargarPendientes = async () => {
+  const cargarPendientes = useCallback(async () => {
     setMsg('');
     try {
       const token = getDriverToken();
@@ -56,21 +30,7 @@ export default function SolicitudesPage() {
     } catch (err) {
       setMsg(`Error: ${err.message}`);
     }
-  };
-
-  const doCotizar = async (e) => {
-    e.preventDefault();
-    setMsg('');
-    try {
-      const token = getDriverToken();
-      const payload = { conductorId: cotizar.conductorId, precio: Number(cotizar.precio) };
-      const res = await solicitudes.cotizar(cotizar.id, payload, token);
-      setMsg(`Cotizada id=${res.id} precio=${res.precio}`);
-      cargarPendientes();
-    } catch (err) {
-      setMsg(`Error: ${err.message}`);
-    }
-  };
+  }, [getDriverToken, getDriverId]);
 
   const aceptar = async (id) => {
     setMsg('');
@@ -96,103 +56,79 @@ export default function SolicitudesPage() {
     }
   };
 
-  const doActualizar = async (e) => {
-    e.preventDefault();
-    setMsg('');
-    try {
-      const token = getDriverToken() || getUserToken();
-      const res = await solicitudes.actualizarEstado(actualizar.id, actualizar.estado, token);
-      setMsg(`Solicitud ${res.id} estado=${res.status}`);
-      cargarPendientes();
-      cargarHistorial();
-    } catch (err) {
-      setMsg(`Error: ${err.message}`);
-    }
-  };
 
-  // Autorrellenar datos del cliente (usuario)
   React.useEffect(() => {
-    const uid = getUserId();
     const uemail = getUserEmail();
-    setCrear((c) => ({
-      ...c,
-      clienteId: uid || '',
-      clienteEmail: uemail || '',
-    }));
-    // También setear email para historial si está vacío
     setClienteEmailHist((prev) => prev || uemail || '');
-  }, [getUserId, getUserEmail, user]);
+  }, [getUserEmail, user]);
 
-  // Autorrellenar conductorId para cotizar
   React.useEffect(() => {
-    const did = getDriverId();
-    setCotizar((ct) => ({ ...ct, conductorId: did || '' }));
-  }, [getDriverId, driver]);
+    if (mode === 'cliente' && user) {
+      cargarHistorial();
+    }
+  }, [mode, user, cargarHistorial]);
+
+  React.useEffect(() => {
+    if (mode === 'conductor' && driver) {
+      cargarPendientes();
+    }
+  }, [mode, driver, cargarPendientes]);
 
   return (
     <div className="page container">
       <h2 className="section-title">Solicitudes</h2>
 
-      <section className="card">
-        <h3 className="section-title">Historial del cliente</h3>
-        <div className="form-grid">
-          <input className="input" placeholder="email del cliente" value={clienteEmailHist} onChange={(e) => setClienteEmailHist(e.target.value)} />
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button className="btn btn-primary" onClick={cargarHistorial}>Buscar</button>
-          </div>
-        </div>
-        <ul className="list" style={{ marginTop: 12 }}>
-          {historial.map((s) => (
-            <li key={s.id}>
-              [{s.status}] {s.cliente_email} {s.origen} → {s.destino} pasajeros={s.pasajeros} {s.precio ? `precio=${s.precio}` : ''}
-            </li>
-          ))}
-        </ul>
-      </section>
+      {mode === 'cliente' && (
+        <section className="card">
+          <h3 className="section-title">Mi historial</h3>
+          {user ? (
+            <>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button className="btn btn-secondary" onClick={cargarHistorial}>Actualizar</button>
+              </div>
+              <ul className="list" style={{ marginTop: 8 }}>
+                {historial.map((s) => (
+                  <li key={s.id}>
+                    [{s.status}] {s.origen} → {s.destino} pasajeros={s.pasajeros} {s.precio ? `precio=${s.precio}` : ''}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <div>Inicia sesión para ver tu historial.</div>
+          )}
+        </section>
+      )}
 
-      <section className="card">
-        <h3 className="section-title">Pendientes del conductor</h3>
-        {driver ? (
-          <>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn btn-secondary" onClick={cargarPendientes}>Recargar pendientes</button>
-            </div>
-            <ul className="list" style={{ marginTop: 12 }}>
-              {pendientes.map((s) => (
-                <li key={s.id}>
-                  [{s.status}] {s.origen} → {s.destino} pasajeros={s.pasajeros} cliente={s.cliente_email}
-                  <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
-                    <button className="btn btn-primary" onClick={() => aceptar(s.id)}>Aceptar</button>
-                    <button className="btn btn-secondary" onClick={() => rechazar(s.id)}>Rechazar</button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-
-            <form onSubmit={doCotizar} className="form-grid" style={{ marginTop: 12 }}>
-              <h4 className="section-title">Cotizar</h4>
-              <input className="input" placeholder="solicitudId" value={cotizar.id} onChange={(e) => setCotizar({ ...cotizar, id: e.target.value })} />
-              <input className="input" placeholder="conductorId" value={cotizar.conductorId} readOnly />
-              <input className="input" placeholder="precio" value={cotizar.precio} onChange={(e) => setCotizar({ ...cotizar, precio: e.target.value })} />
-              <button type="submit" className="btn btn-primary">Cotizar</button>
-            </form>
-
-            <form onSubmit={doActualizar} className="form-grid" style={{ marginTop: 12 }}>
-              <h4 className="section-title">Actualizar estado</h4>
-              <input className="input" placeholder="solicitudId" value={actualizar.id} onChange={(e) => setActualizar({ ...actualizar, id: e.target.value })} />
-              <select className="select" value={actualizar.estado} onChange={(e) => setActualizar({ ...actualizar, estado: e.target.value })}>
-                <option value="aceptada">aceptada</option>
-                <option value="cancelada">cancelada</option>
-                <option value="rechazada">rechazada</option>
-                <option value="completada">completada</option>
-              </select>
-              <button type="submit" className="btn btn-primary">Actualizar</button>
-            </form>
-          </>
-        ) : (
-          <div>Inicia sesión de conductor.</div>
-        )}
-      </section>
+      {mode === 'conductor' && (
+        <section className="card">
+          <h3 className="section-title">Solicitudes pendientes</h3>
+          {driver ? (
+            <>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button className="btn btn-secondary" onClick={cargarPendientes}>Actualizar</button>
+              </div>
+              <ul className="list" style={{ marginTop: 12 }}>
+                {pendientes.filter((s) => s.tipo ? s.tipo !== 'punto' : true).map((s) => (
+                  <li key={s.id}>
+                    <div style={{ display: 'grid', gap: 4 }}>
+                      <div><strong>{s.origen}</strong> → <strong>{s.destino}</strong></div>
+                      <div>Pasajeros: {s.pasajeros}</div>
+                      <div>Cliente: {s.cliente_email}</div>
+                      <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+                        <button className="btn btn-primary" onClick={() => aceptar(s.id)}>Aceptar</button>
+                        <button className="btn btn-secondary" onClick={() => rechazar(s.id)}>Rechazar</button>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <div>Inicia sesión de conductor.</div>
+          )}
+        </section>
+      )}
 
       {msg && <div style={{ marginTop: 16, color: 'var(--color-muted)' }}>{msg}</div>}
     </div>

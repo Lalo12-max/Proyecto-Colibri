@@ -3,28 +3,24 @@ import './style/auth.css';
 import { useAuth } from '../../context/AuthContext';
 
 export function Registro({ onRegistro, goToLogin }) {
-  const [nombreCompleto, setNombreCompleto] = React.useState('');
+  const [nombre, setNombre] = React.useState('');
+  const [apellidos, setApellidos] = React.useState('');
   const [email, setEmail] = React.useState('');
-  const [telefono, setTelefono] = React.useState(''); // opcional
-  const [fechaNac, setFechaNac] = React.useState(''); // opcional
+  const [telefono, setTelefono] = React.useState('');
+  const [fechaNac, setFechaNac] = React.useState('');
   const [error, setError] = React.useState('');
   const [password, setPassword] = React.useState('');
   const { registerUser } = useAuth();
 
   const crear = async () => {
     setError('');
-    if (!nombreCompleto || !email || !password) {
-      setError('Completa nombre, correo y contraseña.');
+    if (!nombre || !apellidos || !email || !password) {
+      setError('Completa nombre, apellidos, correo y contraseña.');
       return;
     }
     const emailOk = /\S+@\S+\.\S+/.test(email);
     if (!emailOk) { setError('Correo inválido.'); return; }
     if (password.length < 8) { setError('La contraseña debe tener al menos 8 caracteres.'); return; }
-
-    // Separar nombre y apellidos desde nombreCompleto
-    const parts = (nombreCompleto || '').trim().split(/\s+/);
-    const nombre = parts.shift() || '';
-    const apellidos = parts.join(' ') || '';
 
     try {
       await registerUser({
@@ -32,8 +28,8 @@ export function Registro({ onRegistro, goToLogin }) {
         password,
         nombre,
         apellidos,
-        telefono, // opcional
-        fechaNacimiento: fechaNac, // opcional
+        telefono,
+        fechaNacimiento: fechaNac,
       });
       onRegistro?.({ nombre, apellidos, email, telefono, fechaNacimiento: fechaNac });
       goToLogin?.();
@@ -44,12 +40,19 @@ export function Registro({ onRegistro, goToLogin }) {
 
   return (
     <div className="split-form-content">
-      <div className="split-form-title">Nombre completo</div>
+      <div className="split-form-title">Nombre</div>
       <input
         className="split-input"
-        value={nombreCompleto}
-        onChange={(e) => setNombreCompleto(e.target.value)}
-        placeholder="Ingresa tu nombre completo"
+        value={nombre}
+        onChange={(e) => setNombre(e.target.value)}
+        placeholder="Ingresa tu nombre"
+      />
+      <div className="split-form-title">Apellidos</div>
+      <input
+        className="split-input"
+        value={apellidos}
+        onChange={(e) => setApellidos(e.target.value)}
+        placeholder="Ingresa tus apellidos"
       />
       <div className="split-form-title">Correo</div>
       <input
@@ -59,7 +62,6 @@ export function Registro({ onRegistro, goToLogin }) {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Ingresa tu correo"
       />
-      {/* NUEVOS CAMPOS VISIBLES */}
       <div className="split-form-title">Teléfono</div>
       <input
         className="split-input"
@@ -75,7 +77,6 @@ export function Registro({ onRegistro, goToLogin }) {
         value={fechaNac}
         onChange={(e) => setFechaNac(e.target.value)}
       />
-      {/* FIN NUEVOS CAMPOS */}
       <div className="split-form-title">Contraseña</div>
       <input
         className="split-input"
@@ -85,13 +86,16 @@ export function Registro({ onRegistro, goToLogin }) {
         placeholder="Ingresa tu contraseña"
       />
       <label className="split-check">
-        <input type="checkbox" /> Al crear tu cuenta aceptas <span className="link-inline">Términos y Condiciones</span>
+        <input type="checkbox" /> Al crear tu cuenta aceptas <a className="link-inline" href="https://politicas-de-privasidad.onrender.com/" target="_blank" rel="noopener noreferrer">Términos y Condiciones</a>
       </label>
       <div className="split-actions">
         <button type="button" className="split-submit" onClick={crear}>Crear cuenta</button>
-        <button className="link-btn" onClick={goToLogin}>Iniciar sesión</button>
+        <div className="link-row">
+        <button type="button" className="link-btn" onClick={goToLogin}>Ya tengo una cuenta</button>
       </div>
-      {error && <div style={{ color: '#f87171', fontSize: 12 }}>{error}</div>}
+      </div>
+      
+      {error && <div style={{ color: 'var(--color-accent)', fontSize: 12 }}>{error}</div>}
     </div>
   );
 }

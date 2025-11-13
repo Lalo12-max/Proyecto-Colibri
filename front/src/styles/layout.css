@@ -1,0 +1,38 @@
+/* Header de app reutilizable para títulos de páginas */
+.app-header {
+  background: linear-gradient(90deg, #eff6ff, #e0f2fe);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.brand { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.brand h1 { margin: 0; font-size: 28px; }
+
+/* Layout de dos columnas */
+.layout { margin-top: 16px; }
+.layout.two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+
+@media (max-width: 900px) {
+  .layout.two-col { grid-template-columns: 1fr; }
+  .brand h1 { font-size: 20px; }
+}
+
+/* Tarjetas y secciones */
+.page.container { padding: 16px; }
+
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.section-title {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 700;
+}

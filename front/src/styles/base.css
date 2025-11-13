@@ -1,0 +1,20 @@
+/* Reset mínimo y base */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Contenedores principales */
+.page { padding: 24px; }
+.container { max-width: 1200px; margin: 0 auto; }
+code { font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace; }
+
+/* Responsivo */
+@media (max-width: 900px) {
+  .page { padding: 12px; }
+}

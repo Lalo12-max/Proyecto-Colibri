@@ -1,0 +1,30 @@
+.viaje-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: var(--color-card);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.viaje-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(2, 21, 78, 0.12);
+}
+
+.viaje-ruta { font-size: 16px; }
+.viaje-bold { font-weight: 600; }
+.viaje-detalles { display: flex; flex-direction: column; gap: 4px; }
+
+.viaje-btn {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}

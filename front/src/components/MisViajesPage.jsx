@@ -15,7 +15,7 @@ export default function MisViajesPage() {
         const token = getDriverToken();
         const did = getDriverId();
         const data = await solicitudesApi.delConductor(did, token);
-        const viajes = (Array.isArray(data) ? data : []).filter((s) => s.status === 'aceptada' || s.status === 'completada');
+        const viajes = (Array.isArray(data) ? data : []).filter((s) => s.status === 'aceptada' || s.status === 'en_progreso' || s.status === 'completada');
         setMisViajes(viajes);
       } catch (err) {
         setMsg(`Error: ${err.message}`);
@@ -24,6 +24,34 @@ export default function MisViajesPage() {
   }, [driver, getDriverToken, getDriverId]);
 
   if (!driver) return <div className="page container">Inicia sesión como conductor.</div>;
+
+  const iniciar = async (id) => {
+    setMsg('');
+    try {
+      const token = getDriverToken();
+      await solicitudesApi.iniciar(id, token);
+      const did = getDriverId();
+      const data = await solicitudesApi.delConductor(did, token);
+      const viajes = (Array.isArray(data) ? data : []).filter((s) => s.status === 'aceptada' || s.status === 'en_progreso' || s.status === 'completada');
+      setMisViajes(viajes);
+    } catch (err) {
+      setMsg(`Error: ${err.message}`);
+    }
+  };
+
+  const finalizar = async (id) => {
+    setMsg('');
+    try {
+      const token = getDriverToken();
+      await solicitudesApi.finalizar(id, token);
+      const did = getDriverId();
+      const data = await solicitudesApi.delConductor(did, token);
+      const viajes = (Array.isArray(data) ? data : []).filter((s) => s.status === 'aceptada' || s.status === 'en_progreso' || s.status === 'completada');
+      setMisViajes(viajes);
+    } catch (err) {
+      setMsg(`Error: ${err.message}`);
+    }
+  };
 
   return (
     <div className="page container">
@@ -38,7 +66,7 @@ export default function MisViajesPage() {
                 const token = getDriverToken();
                 const did = getDriverId();
                 const data = await solicitudesApi.delConductor(did, token);
-                const viajes = (Array.isArray(data) ? data : []).filter((s) => s.status === 'aceptada' || s.status === 'completada');
+                const viajes = (Array.isArray(data) ? data : []).filter((s) => s.status === 'aceptada' || s.status === 'en_progreso' || s.status === 'completada');
                 setMisViajes(viajes);
               } catch (err) {
                 setMsg(`Error: ${err.message}`);
@@ -52,7 +80,17 @@ export default function MisViajesPage() {
         <h3 className="section-title">Listado</h3>
         <ul className="list" style={{ marginTop: 12 }}>
           {misViajes.map((s) => (
-            <li key={s.id}>[{s.status}] {s.origen} → {s.destino} pasajeros={s.pasajeros} cliente={s.cliente_email}</li>
+            <li key={s.id}>
+              [{s.status}] {s.origen} → {s.destino} pasajeros={s.pasajeros} cliente={s.cliente_email}
+              <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+                {s.status === 'aceptada' && (
+                  <button className="btn btn-primary" onClick={() => iniciar(s.id)}>Iniciar</button>
+                )}
+                {s.status === 'en_progreso' && (
+                  <button className="btn btn-secondary" onClick={() => finalizar(s.id)}>Finalizar</button>
+                )}
+              </div>
+            </li>
           ))}
         </ul>
       </div>

@@ -8,6 +8,8 @@ import {
   actualizarEstadoCliente,
   listarSolicitudesCliente,
   listarSolicitudesConductorAsignadas,
+  iniciarSolicitud,
+  finalizarSolicitud,
 } from '../controllers/solicitudes.controller.js';
 
 const router = Router();
@@ -18,6 +20,8 @@ router.get('/solicitudes/conductor/:conductorId/mias', listarSolicitudesConducto
 router.patch('/solicitudes/:id/cotizar', cotizarSolicitud);
 router.patch('/solicitudes/:id/aceptar', aceptarSolicitud);
 router.patch('/solicitudes/:id/rechazar', rechazarSolicitud);
+router.patch('/solicitudes/:id/iniciar', iniciarSolicitud);
+router.patch('/solicitudes/:id/finalizar', finalizarSolicitud);
 router.patch('/solicitudes/:id/estado', actualizarEstadoCliente);
 router.get('/solicitudes/cliente/:email', listarSolicitudesCliente);
 

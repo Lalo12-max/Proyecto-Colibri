@@ -104,28 +104,18 @@ export async function createPunto(req, res) {
       return res.status(400).json({ error: 'Conductor no encontrado.' });
     }
 
-    const hoy = new Date();
-    const fecha = hoy.toISOString().slice(0, 10);
-
     const { data: insertado, error } = await client
-      .from('viajes')
+      .from('puntos')
       .insert({
         conductor_id: conductorId,
         conductor_nombre: conductor.nombre_completo,
-        origen: zonaNombre || puntoSalida,
-        destino: 'A definir',
-        fecha,
-        hora: '00:00',
-        precio: precio_base ? Number(precio_base) : 0,
-        plazas_totales: parseInt(plazas, 10),
-        plazas_disponibles: parseInt(plazas, 10),
-        coche: 'Coche particular',
-        matricula: 'No especificada',
-        estado: 'punto',
         zona_nombre: zonaNombre || null,
         referencia_texto: referenciaTexto || null,
+        punto_salida: puntoSalida || null,
         lat: lat ?? null,
         lng: lng ?? null,
+        plazas: parseInt(plazas, 10),
+        precio_base: precio_base ? Number(precio_base) : 0,
       })
       .select()
       .single();
@@ -134,7 +124,7 @@ export async function createPunto(req, res) {
       return res.status(500).json({ error: error.message });
     }
 
-    return res.status(201).json({ ...insertado, rating: 0 });
+    return res.status(201).json({ ...insertado });
   } catch (_e) {
     return res.status(500).json({ error: 'Error interno de servidor.' });
   }
@@ -144,20 +134,41 @@ export async function listZonas(_req, res) {
   try {
     const client = supabaseAdmin ?? supabase;
     const { data, error } = await client
-      .from('viajes')
+      .from('puntos')
       .select('*')
-      .eq('estado', 'punto')
-      .order('fecha', { ascending: false });
+      .order('created_at', { ascending: false });
     if (error) return res.status(500).json({ error: error.message });
     const mapped = (data ?? []).map((v) => ({
       id: v.id,
-      zonaNombre: v.zona_nombre || v.origen,
+      zonaNombre: v.zona_nombre || v.punto_salida,
       referenciaTexto: v.referencia_texto || null,
       lat: v.lat ?? null,
       lng: v.lng ?? null,
-      plazas: v.plazas_disponibles,
+      plazas: v.plazas,
       conductor: v.conductor_nombre,
-      precio_punto: v.precio,
+      precio_punto: v.precio_base,
+    }));
+    return res.json(mapped);
+  } catch (_e) {
+    return res.status(500).json({ error: 'Error interno de servidor.' });
+  }
+}
+
+export async function listPuntosByConductor(req, res) {
+  try {
+    const { conductorId } = req.params;
+    const client = supabaseAdmin ?? supabase;
+    const { data, error } = await client
+      .from('puntos')
+      .select('*')
+      .eq('conductor_id', conductorId)
+      .order('created_at', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    const mapped = (data ?? []).map((v) => ({
+      id: v.id,
+      from: v.zona_nombre || v.punto_salida,
+      seats: v.plazas,
+      price: v.precio_base,
     }));
     return res.json(mapped);
   } catch (_e) {

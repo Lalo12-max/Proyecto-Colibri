@@ -8,7 +8,7 @@ export async function crearSolicitud(req, res) {
     }
     const client = supabaseAdmin ?? supabase;
     const { data, error } = await client
-      .from('solicitudes_viaje')
+      .from('solicitudes')
       .insert({
         cliente_id: clienteId ?? null,
         cliente_email: clienteEmail,
@@ -51,7 +51,7 @@ export async function listarPendientesConductor(req, res) {
   try {
     const client = supabaseAdmin ?? supabase;
     const { data, error } = await client
-      .from('solicitudes_viaje')
+      .from('solicitudes')
       .select('*')
       .eq('status', 'pendiente')
       .order('created_at', { ascending: false });
@@ -84,7 +84,7 @@ export async function cotizarSolicitud(req, res) {
     if (!conductorId || !precio) return res.status(400).json({ error: 'Faltan campos.' });
     const client = supabaseAdmin ?? supabase;
     const { data, error } = await client
-      .from('solicitudes_viaje')
+      .from('solicitudes')
       .update({
         conductor_id: conductorId,
         precio: Number(precio),
@@ -108,7 +108,7 @@ export async function aceptarSolicitud(req, res) {
     const client = supabaseAdmin ?? supabase;
 
     const { data: s, error: sErr } = await client
-      .from('solicitudes_viaje')
+      .from('solicitudes')
       .select('*')
       .eq('id', id)
       .single();
@@ -120,7 +120,7 @@ export async function aceptarSolicitud(req, res) {
     const precio = calcularPrecio({ origen: s.origen, destino: s.destino, pasajeros: s.pasajeros, tipo: 'solicitud' });
 
     const { data, error } = await client
-      .from('solicitudes_viaje')
+      .from('solicitudes')
       .update({ conductor_id: conductorId, precio, status: 'aceptada' })
       .eq('id', id)
       .select()
@@ -148,7 +148,7 @@ export async function rechazarSolicitud(req, res) {
     const { id } = req.params;
     const client = supabaseAdmin ?? supabase;
     const { data, error } = await client
-      .from('solicitudes_viaje')
+      .from('solicitudes')
       .update({ status: 'rechazada' })
       .eq('id', id)
       .select()
@@ -178,7 +178,7 @@ export async function actualizarEstadoCliente(req, res) {
       : { estado };
 
     const { data, error } = await client
-      .from('solicitudes_viaje')
+      .from('solicitudes')
       .update(update)
       .eq('id', id)
       .select()
@@ -195,7 +195,7 @@ export async function listarSolicitudesCliente(req, res) {
     const { email } = req.params;
     const client = supabaseAdmin ?? supabase;
     const { data, error } = await client
-      .from('solicitudes_viaje')
+      .from('solicitudes')
       .select('*')
       .eq('cliente_email', email)
       .order('created_at', { ascending: false });
@@ -247,6 +247,56 @@ export async function listarSolicitudesConductorAsignadas(req, res) {
     }
 
     return res.json(enriched);
+  } catch (_e) {
+    return res.status(500).json({ error: 'Error interno de servidor.' });
+  }
+}
+
+export async function iniciarSolicitud(req, res) {
+  try {
+    const { id } = req.params;
+    const client = supabaseAdmin ?? supabase;
+    const { data: s, error: sErr } = await client
+      .from('solicitudes_viaje')
+      .select('status')
+      .eq('id', id)
+      .single();
+    if (sErr || !s) return res.status(404).json({ error: 'Solicitud no encontrada.' });
+    if (s.status !== 'aceptada') return res.status(400).json({ error: 'Solo se puede iniciar una solicitud aceptada.' });
+
+    const { data, error } = await client
+      .from('solicitudes_viaje')
+      .update({ status: 'en_progreso', started_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) return res.status(500).json({ error: error.message });
+    return res.json(data);
+  } catch (_e) {
+    return res.status(500).json({ error: 'Error interno de servidor.' });
+  }
+}
+
+export async function finalizarSolicitud(req, res) {
+  try {
+    const { id } = req.params;
+    const client = supabaseAdmin ?? supabase;
+    const { data: s, error: sErr } = await client
+      .from('solicitudes_viaje')
+      .select('status')
+      .eq('id', id)
+      .single();
+    if (sErr || !s) return res.status(404).json({ error: 'Solicitud no encontrada.' });
+    if (s.status !== 'en_progreso') return res.status(400).json({ error: 'Solo se puede finalizar una solicitud en progreso.' });
+
+    const { data, error } = await client
+      .from('solicitudes_viaje')
+      .update({ status: 'completada', completed_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) return res.status(500).json({ error: error.message });
+    return res.json(data);
   } catch (_e) {
     return res.status(500).json({ error: 'Error interno de servidor.' });
   }

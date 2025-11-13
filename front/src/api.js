@@ -44,6 +44,8 @@ export const viajes = {
   misViajes: (conductorId, estado, token) =>
     request(estado ? `/viajes/conductor/${conductorId}?estado=${encodeURIComponent(estado)}` : `/viajes/conductor/${conductorId}`, { token }),
   zonas: () => request('/puntos/zonas'),
+  misPuntos: (conductorId, token) =>
+    request(`/puntos/conductor/${conductorId}`, { token }),
 };
 
 // Solicitudes
@@ -55,6 +57,10 @@ export const solicitudes = {
     request(`/solicitudes/${id}/cotizar`, { method: 'PATCH', body: payload, token }),
   actualizarEstado: (id, estado, token) =>
     request(`/solicitudes/${id}/estado`, { method: 'PATCH', body: { estado }, token }),
+  iniciar: (id, token) =>
+    request(`/solicitudes/${id}/iniciar`, { method: 'PATCH', token }),
+  finalizar: (id, token) =>
+    request(`/solicitudes/${id}/finalizar`, { method: 'PATCH', token }),
   listarCliente: (email, token) =>
     request(`/solicitudes/cliente/${encodeURIComponent(email)}`, { token }),
   delConductor: (driverId, token) =>

@@ -2,7 +2,7 @@ import { supabase, supabaseAdmin } from '../supabaseClient.js';
 
 export async function crearSolicitud(req, res) {
   try {
-    const { clienteId, clienteEmail, origen, destino, pasajeros } = req.body;
+    const { clienteId, clienteEmail, origen, destino, pasajeros, tipo, puntoId } = req.body;
     if (!clienteEmail || !origen || !destino || !pasajeros) {
       return res.status(400).json({ error: 'Faltan campos.' });
     }
@@ -16,6 +16,7 @@ export async function crearSolicitud(req, res) {
         destino,
         pasajeros: parseInt(pasajeros, 10),
         status: 'pendiente',
+        punto_id: puntoId ?? null,
       })
       .select()
       .single();
@@ -117,7 +118,8 @@ export async function aceptarSolicitud(req, res) {
       return res.status(400).json({ error: 'Estado no permite aceptación.' });
     }
 
-    const precio = calcularPrecio({ origen: s.origen, destino: s.destino, pasajeros: s.pasajeros, tipo: 'solicitud' });
+    const tipoCalc = s.punto_id ? 'punto' : 'solicitud';
+    const precio = calcularPrecio({ origen: s.origen, destino: s.destino, pasajeros: s.pasajeros, tipo: tipoCalc });
 
     const { data, error } = await client
       .from('solicitudes')
@@ -226,7 +228,7 @@ export async function listarSolicitudesConductorAsignadas(req, res) {
     const { conductorId } = req.params;
     const client = supabaseAdmin ?? supabase;
     const { data, error } = await client
-      .from('solicitudes_viaje')
+      .from('solicitudes')
       .select('*')
       .eq('conductor_id', conductorId)
       .order('created_at', { ascending: false });
@@ -257,7 +259,7 @@ export async function iniciarSolicitud(req, res) {
     const { id } = req.params;
     const client = supabaseAdmin ?? supabase;
     const { data: s, error: sErr } = await client
-      .from('solicitudes_viaje')
+      .from('solicitudes')
       .select('status')
       .eq('id', id)
       .single();
@@ -265,8 +267,8 @@ export async function iniciarSolicitud(req, res) {
     if (s.status !== 'aceptada') return res.status(400).json({ error: 'Solo se puede iniciar una solicitud aceptada.' });
 
     const { data, error } = await client
-      .from('solicitudes_viaje')
-      .update({ status: 'en_progreso', started_at: new Date().toISOString() })
+      .from('solicitudes')
+      .update({ status: 'en_progreso' })
       .eq('id', id)
       .select()
       .single();
@@ -282,7 +284,7 @@ export async function finalizarSolicitud(req, res) {
     const { id } = req.params;
     const client = supabaseAdmin ?? supabase;
     const { data: s, error: sErr } = await client
-      .from('solicitudes_viaje')
+      .from('solicitudes')
       .select('status')
       .eq('id', id)
       .single();
@@ -290,8 +292,8 @@ export async function finalizarSolicitud(req, res) {
     if (s.status !== 'en_progreso') return res.status(400).json({ error: 'Solo se puede finalizar una solicitud en progreso.' });
 
     const { data, error } = await client
-      .from('solicitudes_viaje')
-      .update({ status: 'completada', completed_at: new Date().toISOString() })
+      .from('solicitudes')
+      .update({ status: 'completada' })
       .eq('id', id)
       .select()
       .single();

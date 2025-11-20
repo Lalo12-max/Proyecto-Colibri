@@ -133,12 +133,19 @@ export async function createPunto(req, res) {
 export async function listZonas(_req, res) {
   try {
     const client = supabaseAdmin ?? supabase;
-    const { data, error } = await client
+    const { data: puntos, error } = await client
       .from('puntos')
       .select('*')
+      .gt('plazas', 0)
       .order('created_at', { ascending: false });
     if (error) return res.status(500).json({ error: error.message });
-    const mapped = (data ?? []).map((v) => ({
+    const { data: ocupadas } = await client
+      .from('solicitudes')
+      .select('punto_id,status')
+      .in('status', ['aceptada', 'en_progreso']);
+    const usados = new Set((ocupadas ?? []).filter((s) => s.punto_id).map((s) => s.punto_id));
+    const visibles = (puntos ?? []).filter((p) => !usados.has(p.id));
+    const mapped = visibles.map((v) => ({
       id: v.id,
       zonaNombre: v.zona_nombre || v.punto_salida,
       referenciaTexto: v.referencia_texto || null,

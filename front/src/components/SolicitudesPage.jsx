@@ -8,6 +8,7 @@ export default function SolicitudesPage({ mode = 'cliente' }) {
   const [historial, setHistorial] = useState([]);
   const [pendientes, setPendientes] = useState([]);
   const [msg, setMsg] = useState('');
+  const [bloqueado, setBloqueado] = useState(false);
 
 
   const cargarHistorial = useCallback(async () => {
@@ -71,8 +72,16 @@ export default function SolicitudesPage({ mode = 'cliente' }) {
   React.useEffect(() => {
     if (mode === 'conductor' && driver) {
       cargarPendientes();
+      (async () => {
+        try {
+          const token = getDriverToken();
+          const asignadas = await solicitudes.delConductor(getDriverId(), token);
+          const activo = (Array.isArray(asignadas) ? asignadas : []).some((s) => s.status === 'aceptada' || s.status === 'en_progreso');
+          setBloqueado(activo);
+        } catch {}
+      })();
     }
-  }, [mode, driver, cargarPendientes]);
+  }, [mode, driver, cargarPendientes, getDriverToken, getDriverId]);
 
   return (
     <div className="page container">
@@ -109,8 +118,8 @@ export default function SolicitudesPage({ mode = 'cliente' }) {
                 <button className="btn btn-secondary" onClick={cargarPendientes}>Actualizar</button>
               </div>
               <ul className="list" style={{ marginTop: 12 }}>
-                {pendientes.filter((s) => s.tipo ? s.tipo !== 'punto' : true).map((s) => (
-                  <li key={s.id}>
+                {pendientes.filter((s) => !s.punto_id).map((s) => (
+                  <li key={s.id} className="sol-item">
                     <div style={{ display: 'grid', gap: 4 }}>
                       <div><strong>{s.origen}</strong> → <strong>{s.destino}</strong></div>
                       <div>Pasajeros: {s.pasajeros}</div>
@@ -119,6 +128,9 @@ export default function SolicitudesPage({ mode = 'cliente' }) {
                         <button className="btn btn-primary" onClick={() => aceptar(s.id)}>Aceptar</button>
                         <button className="btn btn-secondary" onClick={() => rechazar(s.id)}>Rechazar</button>
                       </div>
+                    </div>
+                    <div className="sol-item-meta">
+                      Estado: {s.status} | Pasajeros: {s.pasajeros} {s.precio ? `| Precio: ${s.precio}` : ''} {s.conductor_nombre ? `| Conductor: ${s.conductor_nombre}` : ''}
                     </div>
                   </li>
                 ))}

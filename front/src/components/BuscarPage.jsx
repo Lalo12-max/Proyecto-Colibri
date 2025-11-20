@@ -168,7 +168,7 @@ export default function BuscarPage() {
         <section className="card">
           <h3 className="section-title">Solicitar viaje</h3>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }}>
+          <div className="layout two-col">
             <div>
               <RouteMap origen={nueva.origen} destino={nueva.destino} />
             </div>
@@ -224,7 +224,7 @@ export default function BuscarPage() {
           </ul>
 
           {showModal && (
-            <div style={{ position: 'fixed', right: 0, top: 0, height: '100%', width: 'min(420px, 90%)', background: '#fff', boxShadow: '0 0 20px rgba(0,0,0,0.2)', zIndex: 1000 }}>
+            <div style={{ position: 'fixed', right: 0, top: 64, height: 'calc(100% - 64px)', width: 'min(420px, 90%)', background: '#fff', boxShadow: '0 0 20px rgba(0,0,0,0.2)', zIndex: 1000 }}>
               <div className="card" style={{ height: '100%' }}>
                 <h3 className="section-title">Selecciona {selectingField}</h3>
                 <div className="input-wrap">

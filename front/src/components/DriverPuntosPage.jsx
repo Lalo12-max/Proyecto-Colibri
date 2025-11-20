@@ -158,7 +158,7 @@ export default function DriverPuntosPage() {
             <input className="input" placeholder="referencia (Descripción)" value={nuevoPunto.referenciaTexto} onChange={(e) => setNuevoPunto({ ...nuevoPunto, referenciaTexto: e.target.value })} />
             <input className="input" placeholder="Punto de Salida" value={nuevoPunto.puntoSalida} onChange={(e) => setNuevoPunto({ ...nuevoPunto, puntoSalida: e.target.value })} />
             <input className="input" placeholder="Plazas disponibles" value={nuevoPunto.plazas} onChange={(e) => setNuevoPunto({ ...nuevoPunto, plazas: e.target.value })} />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="grid-two">
               <button type="button" className="btn" onClick={() => { setShowModal(true); setPickedCoord(null); setModalQuery(''); setModalResults([]); }}>Elegir ubicación en mapa</button>
               <div style={{ alignSelf: 'center', fontSize: 12, color: 'var(--color-muted)' }}>{nuevoPunto.lat && nuevoPunto.lng ? `📍 ${Number(nuevoPunto.lat).toFixed(5)}, ${Number(nuevoPunto.lng).toFixed(5)}` : 'Sin coordenadas'}</div>
             </div>

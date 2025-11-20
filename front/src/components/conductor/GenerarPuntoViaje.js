@@ -60,7 +60,7 @@ export function GenerarPuntoViaje({ onGenerar }) {
             onChange={(e) => setPlazas(e.target.value)}
           />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div className="grid-two">
           <div className="input-wrap">
             <label className="input-label">📍 Lat</label>
             <input className="auth-input" placeholder="19.123" value={lat} onChange={(e) => setLat(e.target.value)} />

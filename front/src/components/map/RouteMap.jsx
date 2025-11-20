@@ -75,7 +75,7 @@ function FitToData({ from, to, path }) {
   return null;
 }
 
-export function RouteMap({ origen, destino, height = 620 }) {
+export function RouteMap({ origen, destino, height = 'clamp(280px, 50vh, 520px)' }) {
   const [from, setFrom] = React.useState(null);
   const [to, setTo] = React.useState(null);
   const [path, setPath] = React.useState([]);

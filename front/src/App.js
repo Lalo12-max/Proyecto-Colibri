@@ -50,8 +50,6 @@ function MenuPanel({ open, onClose }) {
               <Link to="/" className="menu-item" onClick={onClose}><span className="icon">🏠</span><span>Inicio</span></Link>
               <Link to="/usuario/auth?view=login" className="menu-item" onClick={onClose}><span className="icon">🔑</span><span>Iniciar sesión</span></Link>
               <Link to="/usuario/auth?view=registro" className="menu-item" onClick={onClose}><span className="icon">🆕</span><span>Crear cuenta</span></Link>
-              <Link to="/conductor?view=login" className="menu-item" onClick={onClose}><span className="icon">🔑</span><span>Conductor: Iniciar sesión</span></Link>
-              <Link to="/conductor?view=registro" className="menu-item" onClick={onClose}><span className="icon">🆕</span><span>Conductor: Crear cuenta</span></Link>
             </>
           )}
         </nav>
@@ -117,9 +115,10 @@ function App() {
               <span></span>
               <span></span>
             </button>
-            
-            <MenuPanel open={menuOpen} onClose={() => setMenuOpen(false)} />
           </header>
+
+          {menuOpen && <div className="menu-backdrop" onClick={() => setMenuOpen(false)} />}
+          <MenuPanel open={menuOpen} onClose={() => setMenuOpen(false)} />
 
           <Routes>
             <Route path="/" element={<HomeRoute />} />

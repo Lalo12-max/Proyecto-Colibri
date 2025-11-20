@@ -406,7 +406,7 @@
   opacity: 0;
   pointer-events: none;
   transition: transform 180ms ease, opacity 180ms ease;
-  z-index: 300;
+  z-index: 1200;
 }
 .menu-panel.open {
   transform: none;

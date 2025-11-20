@@ -12,6 +12,7 @@ import DriverPuntosPage from './components/DriverPuntosPage';
 import UserMisViajesPage from './components/UserMisViajesPage';
 import UserPerfil from './components/UserPerfil';
 import { ConductorPerfil } from './components/conductor/ConductorPerfil';
+import TurismoPage from './components/TurismoPage';
 import './App.css';
 
 
@@ -29,7 +30,8 @@ function MenuPanel({ open, onClose }) {
             <>
               <Link to="/" className="menu-item" onClick={onClose}><span className="icon">🏠</span><span>Inicio</span></Link>
               <Link to="/usuario/mis-viajes" className="menu-item" onClick={onClose}><span className="icon">🌍</span><span>Mis Viajes</span></Link>
-              <Link to="/usuario/mis-solicitudes" className="menu-item" onClick={onClose}><span className="icon">✉️</span><span>Mis Solicitudes</span></Link>
+              <Link to="/usuario/mis-solicitudes" className="menu-item" onClick={onClose}><span className="icon">✉</span><span>Mis Solicitudes</span></Link>
+              <Link to="/usuario/turismo" className="menu-item" onClick={onClose}><span className="icon">🏞</span><span>Turismo</span></Link>
               <Link to="/usuario" className="menu-item" onClick={onClose}><span className="icon">👤</span><span>Perfil</span></Link>
               <button className="menu-item" onClick={() => { logoutUser(); onClose?.(); }}><span className="icon">🚪</span><span>Cerrar sesión</span></button>
             </>
@@ -66,6 +68,7 @@ function DesktopNav() {
           <Link to="/" className="nav-link">Inicio</Link>
           <Link to="/usuario/mis-viajes" className="nav-link">Mis Viajes</Link>
           <Link to="/usuario/mis-solicitudes" className="nav-link">Mis Solicitudes</Link>
+          <Link to="/usuario/turismo" className="nav-link">Turismo</Link>
           <Link to="/usuario" className="nav-link">Perfil</Link>
           <Link to="/usuario" className="nav-link" onClick={logoutUser}>Cerrar sesión</Link>
         </>
@@ -124,6 +127,7 @@ function App() {
             <Route path="/usuario/auth" element={<UserAuthPage />} />
             <Route path="/usuario/mis-viajes" element={<UserMisViajesPage />} />
             <Route path="/usuario/mis-solicitudes" element={<SolicitudesPage mode="cliente" />} />
+            <Route path="/usuario/turismo" element={<TurismoPage />} />
             <Route path="/conductor" element={<DriverAuthPage />} />
             <Route path="/conductor/perfil" element={<ConductorPerfil />} />
             <Route path="/conductor/mis-viajes" element={<MisViajesPage />} />

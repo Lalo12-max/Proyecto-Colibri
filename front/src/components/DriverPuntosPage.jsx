@@ -151,7 +151,7 @@ export default function DriverPuntosPage() {
       <h2 className="section-title">Mis puntos</h2>
 
       <section className="card">
-        <h3 className="section-title">Crear punto</h3>
+        <h3 className="section-title">Crear un punto</h3>
         {driver ? (
           <form onSubmit={crearPunto} className="form-grid">
             <input className="input" placeholder="Nombre del neuvo punto" value={nuevoPunto.zonaNombre} onChange={(e) => setNuevoPunto({ ...nuevoPunto, zonaNombre: e.target.value })} />

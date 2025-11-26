@@ -1,4 +1,8 @@
 export function requestLogger(req, res, next) {
+  console.log("----- Nueva petición -----");
+  console.log("Origin:", req.headers.origin);
+  console.log("URL:", req.originalUrl);
+  console.log("-------------------------");
   const start = Date.now();
 
   const mask = (obj) => {

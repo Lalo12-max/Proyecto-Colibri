@@ -15,7 +15,9 @@ const defaultOrigins = [
   'http://localhost:3001',
   'capacitor://localhost',
   'ionic://localhost',
-  'http://localhost'
+  'http://localhost',
+  'capacitor://app'
+
 ];
 
 const allowedOrigins = [

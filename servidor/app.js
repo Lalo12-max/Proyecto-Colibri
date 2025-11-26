@@ -16,6 +16,7 @@ const defaultOrigins = [
   'capacitor://localhost',
   'ionic://localhost',
   'http://localhost',
+  'https://localhost',
   'capacitor://app'
 
 ];

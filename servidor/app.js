@@ -17,7 +17,9 @@ const defaultOrigins = [
   'ionic://localhost',
   'http://localhost',
   'https://localhost',
-  'capacitor://app'
+  'capacitor://app',
+  'https://proyecto-colibri-1.onrender.com'
+
 
 ];
 

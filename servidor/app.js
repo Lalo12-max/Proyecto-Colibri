@@ -15,7 +15,12 @@ const defaultOrigins = [
   'http://localhost:3001',
   'capacitor://localhost',
   'ionic://localhost',
-  'http://localhost'
+  'http://localhost',
+  'https://localhost',
+  'capacitor://app',
+  'https://proyecto-colibri-1.onrender.com'
+
+
 ];
 
 const allowedOrigins = [

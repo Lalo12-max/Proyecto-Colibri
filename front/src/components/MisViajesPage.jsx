@@ -78,21 +78,41 @@ export default function MisViajesPage() {
 
       <div className="card">
         <h3 className="section-title">Listado</h3>
-        <ul className="list" style={{ marginTop: 12 }}>
-          {misViajes.map((s) => (
-            <li key={s.id}>
-              [{s.status}] {s.origen} → {s.destino} pasajeros={s.pasajeros} cliente={s.cliente_email}
-              <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
-                {s.status === 'aceptada' && (
-                  <button className="btn btn-primary" onClick={() => iniciar(s.id)}>Iniciar</button>
-                )}
-                {s.status === 'en_progreso' && (
-                  <button className="btn btn-secondary" onClick={() => finalizar(s.id)}>Finalizar</button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div style={{ overflowX: 'auto', marginTop: 12 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left', padding: 8 }}>Estado</th>
+                <th style={{ textAlign: 'left', padding: 8 }}>Origen</th>
+                <th style={{ textAlign: 'left', padding: 8 }}>Destino</th>
+                <th style={{ textAlign: 'left', padding: 8 }}>Pasajeros</th>
+                <th style={{ textAlign: 'left', padding: 8 }}>Cliente</th>
+                <th style={{ textAlign: 'left', padding: 8 }}>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {misViajes.map((s) => (
+                <tr key={s.id} style={{ borderTop: '1px solid var(--border-color, #e5e5e5)' }}>
+                  <td style={{ padding: 8 }}>{s.status}</td>
+                  <td style={{ padding: 8 }}>{s.origen}</td>
+                  <td style={{ padding: 8 }}>{s.destino}</td>
+                  <td style={{ padding: 8 }}>{s.pasajeros}</td>
+                  <td style={{ padding: 8 }}>{s.cliente_email}</td>
+                  <td style={{ padding: 8 }}>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      {s.status === 'aceptada' && (
+                        <button className="btn btn-primary" onClick={() => iniciar(s.id)}>Iniciar</button>
+                      )}
+                      {s.status === 'en_progreso' && (
+                        <button className="btn btn-secondary" onClick={() => finalizar(s.id)}>Finalizar</button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {msg && <div style={{ marginTop: 12, color: 'var(--color-muted)' }}>{msg}</div>}

@@ -95,13 +95,30 @@ export default function SolicitudesPage({ mode = 'cliente' }) {
               <div style={{ display: 'flex', gap: 8 }}>
                 <button className="btn btn-secondary" onClick={cargarHistorial}>Actualizar</button>
               </div>
-              <ul className="list" style={{ marginTop: 8 }}>
-                {historial.map((s) => (
-                  <li key={s.id}>
-                    [{s.status}] {s.origen} → {s.destino} pasajeros={s.pasajeros} {s.precio ? `precio=${s.precio}` : ''}
-                  </li>
-                ))}
-              </ul>
+              <div className="card" style={{ overflowX: 'auto', marginTop: 8 }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: 'left', padding: 8 }}>Estado</th>
+                      <th style={{ textAlign: 'left', padding: 8 }}>Origen</th>
+                      <th style={{ textAlign: 'left', padding: 8 }}>Destino</th>
+                      <th style={{ textAlign: 'left', padding: 8 }}>Pasajeros</th>
+                      <th style={{ textAlign: 'left', padding: 8 }}>Precio</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historial.map((s) => (
+                      <tr key={s.id} style={{ borderTop: '1px solid var(--border-color, #e5e5e5)' }}>
+                        <td style={{ padding: 8 }}>{s.status}</td>
+                        <td style={{ padding: 8 }}>{s.origen}</td>
+                        <td style={{ padding: 8 }}>{s.destino}</td>
+                        <td style={{ padding: 8 }}>{s.pasajeros}</td>
+                        <td style={{ padding: 8 }}>{s.precio ?? '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </>
           ) : (
             <div>Inicia sesión para ver tu historial.</div>
@@ -117,24 +134,39 @@ export default function SolicitudesPage({ mode = 'cliente' }) {
               <div style={{ display: 'flex', gap: 8 }}>
                 <button className="btn btn-secondary" onClick={cargarPendientes}>Actualizar</button>
               </div>
-              <ul className="list" style={{ marginTop: 12 }}>
-                {pendientes.filter((s) => !s.punto_id).map((s) => (
-                  <li key={s.id} className="sol-item">
-                    <div style={{ display: 'grid', gap: 4 }}>
-                      <div><strong>{s.origen}</strong> → <strong>{s.destino}</strong></div>
-                      <div>Pasajeros: {s.pasajeros}</div>
-                      <div>Cliente: {s.cliente_email}</div>
-                      <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
-                        <button className="btn btn-primary" onClick={() => aceptar(s.id)}>Aceptar</button>
-                        <button className="btn btn-secondary" onClick={() => rechazar(s.id)}>Rechazar</button>
-                      </div>
-                    </div>
-                    <div className="sol-item-meta">
-                      Estado: {s.status} | Pasajeros: {s.pasajeros} {s.precio ? `| Precio: ${s.precio}` : ''} {s.conductor_nombre ? `| Conductor: ${s.conductor_nombre}` : ''}
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <div className="card" style={{ overflowX: 'auto', marginTop: 12 }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: 'left', padding: 8 }}>Estado</th>
+                      <th style={{ textAlign: 'left', padding: 8 }}>Origen</th>
+                      <th style={{ textAlign: 'left', padding: 8 }}>Destino</th>
+                      <th style={{ textAlign: 'left', padding: 8 }}>Pasajeros</th>
+                      <th style={{ textAlign: 'left', padding: 8 }}>Cliente</th>
+                      <th style={{ textAlign: 'left', padding: 8 }}>Precio</th>
+                      <th style={{ textAlign: 'left', padding: 8 }}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendientes.filter((s) => !s.punto_id).map((s) => (
+                      <tr key={s.id} style={{ borderTop: '1px solid var(--border-color, #e5e5e5)' }}>
+                        <td style={{ padding: 8 }}>{s.status}</td>
+                        <td style={{ padding: 8 }}>{s.origen}</td>
+                        <td style={{ padding: 8 }}>{s.destino}</td>
+                        <td style={{ padding: 8 }}>{s.pasajeros}</td>
+                        <td style={{ padding: 8 }}>{s.cliente_email}</td>
+                        <td style={{ padding: 8 }}>{s.precio ?? '—'}</td>
+                        <td style={{ padding: 8 }}>
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button className="btn btn-primary" onClick={() => aceptar(s.id)}>Aceptar</button>
+                            <button className="btn btn-secondary" onClick={() => rechazar(s.id)}>Rechazar</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </>
           ) : (
             <div>Inicia sesión de conductor.</div>

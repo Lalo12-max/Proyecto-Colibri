@@ -27,6 +27,8 @@ export default function BuscarPage() {
   const abortRef = React.useRef(null);
   const debounceRef = React.useRef(null);
   const [bloqueado, setBloqueado] = useState(false);
+  const [toast, setToast] = useState(null);
+  const showToast = useCallback((text) => { setToast({ text }); setTimeout(() => setToast(null), 4000); }, []);
 
   const fetchSugerencias = async (q, signal, bounds) => {
     if (!q) return [];
@@ -125,6 +127,7 @@ export default function BuscarPage() {
         puntoId: nueva.puntoId,
       };
       await solicitudes.crear(payload, token);
+      showToast('Tu viaje ha sido publicado');
       setMsg(`Solicitud creada: ${payload.origen} → ${payload.destino} (${payload.pasajeros})`);
       setNueva({ origen: '', destino: '', pasajeros: '1', tipo: 'solicitud', puntoId: null });
     } catch (err) {
@@ -215,13 +218,30 @@ export default function BuscarPage() {
           </div>
 
           <h4 className="section-title" style={{ marginTop: 12 }}>Puntos de partida publicados</h4>
-          <ul className="list" style={{ marginTop: 8 }}>
-            {puntos.map((p) => (
-              <li key={p.id}>
-                <strong>{p.zonaNombre}</strong> {p.referenciaTexto ? `— ${p.referenciaTexto}` : ''} | Plazas: {p.plazas} | Conductor: {p.conductor} {p.precio_punto ? `| Precio base: ${p.precio_punto}` : ''}
-              </li>
-            ))}
-          </ul>
+          <div style={{ overflowX: 'auto', marginTop: 8 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left', padding: 8 }}>Punto</th>
+                  <th style={{ textAlign: 'left', padding: 8 }}>Referencia</th>
+                  <th style={{ textAlign: 'left', padding: 8 }}>Plazas</th>
+                  <th style={{ textAlign: 'left', padding: 8 }}>Conductor</th>
+                  <th style={{ textAlign: 'left', padding: 8 }}>Precio base</th>
+                </tr>
+              </thead>
+              <tbody>
+                {puntos.map((p) => (
+                  <tr key={p.id} style={{ borderTop: '1px solid var(--border-color, #e5e5e5)' }}>
+                    <td style={{ padding: 8 }}>{p.zonaNombre}</td>
+                    <td style={{ padding: 8 }}>{p.referenciaTexto || '—'}</td>
+                    <td style={{ padding: 8 }}>{p.plazas}</td>
+                    <td style={{ padding: 8 }}>{p.conductor}</td>
+                    <td style={{ padding: 8 }}>{p.precio_punto ?? '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {showModal && (
             <div style={{ position: 'fixed', right: 0, top: 64, height: 'calc(100% - 64px)', width: 'min(420px, 90%)', background: '#fff', boxShadow: '0 0 20px rgba(0,0,0,0.2)', zIndex: 1000 }}>
@@ -288,6 +308,12 @@ export default function BuscarPage() {
         </section>
 
         {msg && <div style={{ marginTop: 12, color: 'var(--color-muted)' }}>{msg}</div>}
+        {toast && (
+          <div style={{ position: 'fixed', right: 16, bottom: 16, background: '#fff', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', borderRadius: 12, padding: 12, zIndex: 2000, minWidth: 280, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ fontWeight: 600 }}>{toast.text}</div>
+            <button className="btn" onClick={() => setToast(null)}>Cerrar</button>
+          </div>
+        )}
       </div>
     </div>
   );

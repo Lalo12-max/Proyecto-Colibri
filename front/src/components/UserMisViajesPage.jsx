@@ -40,13 +40,30 @@ export default function UserMisViajesPage() {
               }
             })();
           }}>Actualizar</button>
-          <ul className="list" style={{ marginTop: 12 }}>
-            {items.map((s) => (
-              <li key={s.id}>
-                [{s.status}] {s.origen} → {s.destino} pasajeros={s.pasajeros} {s.precio ? `precio=${s.precio}` : ''}
-              </li>
-            ))}
-          </ul>
+          <div className="card" style={{ overflowX: 'auto', marginTop: 12 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left', padding: 8 }}>Estado</th>
+                  <th style={{ textAlign: 'left', padding: 8 }}>Origen</th>
+                  <th style={{ textAlign: 'left', padding: 8 }}>Destino</th>
+                  <th style={{ textAlign: 'left', padding: 8 }}>Pasajeros</th>
+                  <th style={{ textAlign: 'left', padding: 8 }}>Precio</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((s) => (
+                  <tr key={s.id} style={{ borderTop: '1px solid var(--border-color, #e5e5e5)' }}>
+                    <td style={{ padding: 8 }}>{s.status}</td>
+                    <td style={{ padding: 8 }}>{s.origen}</td>
+                    <td style={{ padding: 8 }}>{s.destino}</td>
+                    <td style={{ padding: 8 }}>{s.pasajeros}</td>
+                    <td style={{ padding: 8 }}>{s.precio ?? '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       ) : (
         <div>Inicia sesión para ver tus viajes.</div>

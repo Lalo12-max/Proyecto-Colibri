@@ -175,17 +175,37 @@ export default function DriverPuntosPage() {
         {driver ? (
           <>
             <button className="btn" onClick={cargarSolicitudesPunto}>Recargar</button>
-            <ul className="list" style={{ marginTop: 12 }}>
-              {pendientesPunto.map((s) => (
-                <li key={s.id}>
-                  [{s.status}] {s.origen} → {s.destino} pasajeros={s.pasajeros} cliente={s.cliente_email}
-                  <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
-                    <button className="btn btn-primary" disabled={bloqueado} onClick={() => aceptar(s.id)}>Aceptar</button>
-                    <button className="btn btn-secondary" disabled={bloqueado} onClick={() => rechazar(s.id)}>Rechazar</button>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div style={{ overflowX: 'auto', marginTop: 12 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: 'left', padding: 8 }}>Estado</th>
+                    <th style={{ textAlign: 'left', padding: 8 }}>Origen</th>
+                    <th style={{ textAlign: 'left', padding: 8 }}>Destino</th>
+                    <th style={{ textAlign: 'left', padding: 8 }}>Pasajeros</th>
+                    <th style={{ textAlign: 'left', padding: 8 }}>Cliente</th>
+                    <th style={{ textAlign: 'left', padding: 8 }}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendientesPunto.map((s) => (
+                    <tr key={s.id} style={{ borderTop: '1px solid var(--border-color, #e5e5e5)' }}>
+                      <td style={{ padding: 8 }}>{s.status}</td>
+                      <td style={{ padding: 8 }}>{s.origen}</td>
+                      <td style={{ padding: 8 }}>{s.destino}</td>
+                      <td style={{ padding: 8 }}>{s.pasajeros}</td>
+                      <td style={{ padding: 8 }}>{s.cliente_email}</td>
+                      <td style={{ padding: 8 }}>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button className="btn btn-primary" disabled={bloqueado} onClick={() => aceptar(s.id)}>Aceptar</button>
+                          <button className="btn btn-secondary" disabled={bloqueado} onClick={() => rechazar(s.id)}>Rechazar</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </>
         ) : (
           <div>Inicia sesión de conductor para ver solicitudes.</div>
@@ -197,13 +217,26 @@ export default function DriverPuntosPage() {
         {driver ? (
           <>
             <button className="btn" onClick={cargarMisPuntos}>Recargar</button>
-            <ul className="list" style={{ marginTop: 12 }}>
-              {misPuntos.map((v) => (
-                <li key={v.id}>
-                  {v.from} | Plazas: {v.seats} | Precio: {v.price}€
-                </li>
-              ))}
-            </ul>
+            <div style={{ overflowX: 'auto', marginTop: 12 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: 'left', padding: 8 }}>Punto</th>
+                    <th style={{ textAlign: 'left', padding: 8 }}>Plazas</th>
+                    <th style={{ textAlign: 'left', padding: 8 }}>Precio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {misPuntos.map((v) => (
+                    <tr key={v.id} style={{ borderTop: '1px solid var(--border-color, #e5e5e5)' }}>
+                      <td style={{ padding: 8 }}>{v.from}</td>
+                      <td style={{ padding: 8 }}>{v.seats}</td>
+                      <td style={{ padding: 8 }}>{v.price}€</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </>
         ) : (
           <div>Inicia sesión de conductor para ver tus puntos.</div>

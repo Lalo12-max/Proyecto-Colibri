@@ -7,6 +7,7 @@ body {
   font-family: var(--font-sans);
   background: var(--color-bg);
   color: var(--color-text);
+  overflow-x: hidden;
 }
 
 /* Contenedores principales */

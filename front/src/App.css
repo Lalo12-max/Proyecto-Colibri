@@ -363,7 +363,7 @@
 .menu-header {
   position: sticky;
   top: 0;
-  z-index: 200;
+  z-index: 1050;
   background: #0b5561; /* tono similar al ejemplo */
   border-radius: 0;
   padding: 12px 16px;

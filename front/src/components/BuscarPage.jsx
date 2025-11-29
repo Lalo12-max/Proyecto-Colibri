@@ -167,57 +167,55 @@ export default function BuscarPage() {
         <div className="brand"><h1>Solicitar viaje</h1></div>
       </div>
       <div style={{ marginTop: 16 }}>
-        {/* MAPA a pantalla completa dentro de la tarjeta */}
+        <div className="layout two-col">
+          <section className="card">
+            <h3 className="section-title">Mapa y ruta</h3>
+            <RouteMap origen={nueva.origen} destino={nueva.destino} />
+          </section>
+          <section className="card">
+            <h3 className="section-title">Planificador</h3>
+            <div className="input-wrap">
+              <button type="button" className="btn btn-secondary" onClick={() => { setSelectingField('origen'); setPickedCoord(null); setModalQuery(''); setModalResults([]); setShowModal(true); }}>Buscar origen</button>
+            </div>
+            <div className="input-wrap">
+              <label className="input-label">Origen sugerido</label>
+              <select className="buscar-input" value={nueva.puntoId || ''} onChange={(e) => {
+                const id = e.target.value || null;
+                const p = puntos.find((pp) => String(pp.id) === String(id));
+                if (!p) { setNueva({ ...nueva, puntoId: null, tipo: 'solicitud' }); return; }
+                const coord = p.lat != null && p.lng != null ? `${p.lat},${p.lng}` : (p.zonaNombre || '');
+                setNueva({ ...nueva, origen: coord, puntoId: p.id, tipo: 'punto' });
+              }}>
+                <option value="">—</option>
+                {puntos.map((p) => (
+                  <option key={`orig-${p.id}`} value={p.id}>{p.zonaNombre} {p.referenciaTexto ? `— ${p.referenciaTexto}` : ''}</option>
+                ))}
+              </select>
+            </div>
+            <div className="input-wrap" style={{ marginTop: 8 }}>
+              <button type="button" className="btn btn-secondary" onClick={() => { setSelectingField('destino'); setPickedCoord(null); setModalQuery(''); setModalResults([]); setShowModal(true); }}>Buscar destino</button>
+            </div>
+            <div className="input-wrap">
+              <label className="input-label">Destino sugerido</label>
+              <select className="buscar-input" value={nueva.destino} onChange={(e) => setNueva({ ...nueva, destino: e.target.value })}>
+                <option value="">—</option>
+                {puntos.map((p) => (
+                  <option key={`dest-${p.id}`} value={p.lat != null && p.lng != null ? `${p.lat},${p.lng}` : (p.zonaNombre || '')}>{p.zonaNombre} {p.referenciaTexto ? `— ${p.referenciaTexto}` : ''}</option>
+                ))}
+              </select>
+            </div>
+            <div className="input-wrap">
+              <label className="input-label">Pasajeros</label>
+              <input className="buscar-input" type="number" min="1" max="6" placeholder="1" value={nueva.pasajeros} onChange={(e) => setNueva({ ...nueva, pasajeros: e.target.value })} />
+            </div>
+            <div className="overlay-actions">
+              <button type="button" className="btn btn-primary" disabled={bloqueado} onClick={crearSolicitud}>Crear</button>
+            </div>
+          </section>
+        </div>
+
         <section className="card">
-          <h3 className="section-title">Solicitar viaje</h3>
-
-          <div className="layout two-col">
-            <div>
-              <RouteMap origen={nueva.origen} destino={nueva.destino} />
-            </div>
-            <div className="card" style={{ padding: 12 }}>
-              <h4 className="section-title">Planificador</h4>
-              <div className="input-wrap">
-                <button type="button" className="btn btn-secondary" onClick={() => { setSelectingField('origen'); setPickedCoord(null); setModalQuery(''); setModalResults([]); setShowModal(true); }}>Buscar origen</button>
-              </div>
-              <div className="input-wrap">
-                <label className="input-label">Origen sugerido</label>
-                <select className="buscar-input" value={nueva.puntoId || ''} onChange={(e) => {
-                  const id = e.target.value || null;
-                  const p = puntos.find((pp) => String(pp.id) === String(id));
-                  if (!p) { setNueva({ ...nueva, puntoId: null, tipo: 'solicitud' }); return; }
-                  const coord = p.lat != null && p.lng != null ? `${p.lat},${p.lng}` : (p.zonaNombre || '');
-                  setNueva({ ...nueva, origen: coord, puntoId: p.id, tipo: 'punto' });
-                }}>
-                  <option value="">—</option>
-                  {puntos.map((p) => (
-                    <option key={`orig-${p.id}`} value={p.id}>{p.zonaNombre} {p.referenciaTexto ? `— ${p.referenciaTexto}` : ''}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="input-wrap" style={{ marginTop: 8 }}>
-                <button type="button" className="btn btn-secondary" onClick={() => { setSelectingField('destino'); setPickedCoord(null); setModalQuery(''); setModalResults([]); setShowModal(true); }}>Buscar destino</button>
-              </div>
-              <div className="input-wrap">
-                <label className="input-label">Destino sugerido</label>
-                <select className="buscar-input" value={nueva.destino} onChange={(e) => setNueva({ ...nueva, destino: e.target.value })}>
-                  <option value="">—</option>
-                  {puntos.map((p) => (
-                    <option key={`dest-${p.id}`} value={p.lat != null && p.lng != null ? `${p.lat},${p.lng}` : (p.zonaNombre || '')}>{p.zonaNombre} {p.referenciaTexto ? `— ${p.referenciaTexto}` : ''}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="input-wrap">
-                <label className="input-label">Pasajeros</label>
-                <input className="buscar-input" type="number" min="1" max="6" placeholder="1" value={nueva.pasajeros} onChange={(e) => setNueva({ ...nueva, pasajeros: e.target.value })} />
-              </div>
-              <div className="overlay-actions">
-                <button type="button" className="btn btn-primary" disabled={bloqueado} onClick={crearSolicitud}>Crear</button>
-              </div>
-            </div>
-          </div>
-
-          <h4 className="section-title" style={{ marginTop: 12 }}>Puntos de partida publicados</h4>
+          <h3 className="section-title">Puntos de partida publicados</h3>
           <div style={{ overflowX: 'auto', marginTop: 8 }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -242,70 +240,70 @@ export default function BuscarPage() {
               </tbody>
             </table>
           </div>
+        </section>
 
-          {showModal && (
-            <div style={{ position: 'fixed', right: 0, top: 64, height: 'calc(100% - 64px)', width: 'min(420px, 90%)', background: '#fff', boxShadow: '0 0 20px rgba(0,0,0,0.2)', zIndex: 1000 }}>
-              <div className="card" style={{ height: '100%' }}>
-                <h3 className="section-title">Selecciona {selectingField}</h3>
-                <div className="input-wrap">
-                  <input className="buscar-input" placeholder={`Buscar ${selectingField}`} value={modalQuery} onChange={(e) => {
-                    const q = e.target.value; setModalQuery(q);
-                    if (debounceRef.current) clearTimeout(debounceRef.current);
-                    debounceRef.current = setTimeout(async () => {
-                      try {
-                        if (abortRef.current) abortRef.current.abort();
-                        abortRef.current = new AbortController();
-                        let sugs = await fetchSugerencias(q, abortRef.current.signal, modalBounds);
-                        let res = sugs.map((s) => { const [lat, lng] = s.value.split(',').map(Number); return { lat, lng, label: s.label }; });
-                        if (res.length === 0) {
-                          const sugs2 = await fetchPhoton(q, abortRef.current.signal, modalBounds, modalCenter);
-                          res = sugs2.map((s) => { const [lat, lng] = s.value.split(',').map(Number); return { lat, lng, label: s.label }; });
-                        }
-                        res = res.map((r) => ({ ...r, distKm: distanceKm(modalCenter.lat, modalCenter.lng, r.lat, r.lng) }))
-                          .sort((a, b) => (a.distKm ?? 0) - (b.distKm ?? 0));
-                        setModalResults(res);
-                        setModalError('');
-                      } catch (_e) {
-                        setModalResults([]);
-                        setModalError('Fallo de red o límite de búsqueda. Intenta de nuevo.');
+        {showModal && (
+          <div style={{ position: 'fixed', right: 0, top: 64, height: 'calc(100% - 64px)', width: 'min(420px, 90%)', background: '#fff', boxShadow: '0 0 20px rgba(0,0,0,0.2)', zIndex: 1000 }}>
+            <div className="card" style={{ height: '100%' }}>
+              <h3 className="section-title">Selecciona {selectingField}</h3>
+              <div className="input-wrap">
+                <input className="buscar-input" placeholder={`Buscar ${selectingField}`} value={modalQuery} onChange={(e) => {
+                  const q = e.target.value; setModalQuery(q);
+                  if (debounceRef.current) clearTimeout(debounceRef.current);
+                  debounceRef.current = setTimeout(async () => {
+                    try {
+                      if (abortRef.current) abortRef.current.abort();
+                      abortRef.current = new AbortController();
+                      let sugs = await fetchSugerencias(q, abortRef.current.signal, modalBounds);
+                      let res = sugs.map((s) => { const [lat, lng] = s.value.split(',').map(Number); return { lat, lng, label: s.label }; });
+                      if (res.length === 0) {
+                        const sugs2 = await fetchPhoton(q, abortRef.current.signal, modalBounds, modalCenter);
+                        res = sugs2.map((s) => { const [lat, lng] = s.value.split(',').map(Number); return { lat, lng, label: s.label }; });
                       }
-                    }, 400);
-                  }} />
-                  {modalError && <div style={{ color: 'var(--color-accent)', fontSize: 12, marginTop: 6 }}>{modalError}</div>}
-                  {modalResults.length > 0 && (
-                    <ul className="list" style={{ maxHeight: 160, overflow: 'auto', marginTop: 6 }}>
-                      {modalResults.map((r, idx) => (
-                        <li key={`txt-${idx}`}>
-                          <button type="button" className="btn" onClick={() => setPickedCoord(`${r.lat},${r.lng}`)}>📍 {r.label} {r.distKm != null ? `— ${r.distKm.toFixed(1)} km` : ''}</button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div style={{ height: '70%' }}>
-                  <MapContainer center={[21.5458, -99.6894]} zoom={13} style={{ height: '100%', width: '100%' }}>
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
-                    <CaptureBounds onChange={setModalBounds} onCenter={setModalCenter} />
-                    <PickOnClick onPick={({ lat, lng }) => setPickedCoord(`${lat},${lng}`)} />
+                      res = res.map((r) => ({ ...r, distKm: distanceKm(modalCenter.lat, modalCenter.lng, r.lat, r.lng) }))
+                        .sort((a, b) => (a.distKm ?? 0) - (b.distKm ?? 0));
+                      setModalResults(res);
+                      setModalError('');
+                    } catch (_e) {
+                      setModalResults([]);
+                      setModalError('Fallo de red o límite de búsqueda. Intenta de nuevo.');
+                    }
+                  }, 400);
+                }} />
+                {modalError && <div style={{ color: 'var(--color-accent)', fontSize: 12, marginTop: 6 }}>{modalError}</div>}
+                {modalResults.length > 0 && (
+                  <ul className="list" style={{ maxHeight: 160, overflow: 'auto', marginTop: 6 }}>
                     {modalResults.map((r, idx) => (
-                      <Marker key={`res-${idx}`} position={[r.lat, r.lng]} icon={L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png', shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41] })} eventHandlers={{ click: () => setPickedCoord(`${r.lat},${r.lng}`) }} />
+                      <li key={`txt-${idx}`}>
+                        <button type="button" className="btn" onClick={() => setPickedCoord(`${r.lat},${r.lng}`)}>📍 {r.label} {r.distKm != null ? `— ${r.distKm.toFixed(1)} km` : ''}</button>
+                      </li>
                     ))}
-                    <FitToResults results={modalResults} />
-                    {pickedCoord && (() => { const [lat, lng] = pickedCoord.split(',').map(Number); return <Marker position={[lat, lng]} icon={L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png', shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] })} />; })()}
-                  </MapContainer>
-                </div>
-                <div className="card-actions" style={{ marginTop: 10 }}>
-                  <button className="btn btn-secondary" onClick={() => { setShowModal(false); setPickedCoord(null); setSelectingField(null); }}>Cerrar</button>
-                  <button className="btn btn-primary" disabled={!pickedCoord} onClick={() => {
-                    if (selectingField === 'origen') setNueva({ ...nueva, origen: pickedCoord, tipo: 'solicitud', puntoId: null });
-                    if (selectingField === 'destino') setNueva({ ...nueva, destino: pickedCoord });
-                    setShowModal(false); setPickedCoord(null); setSelectingField(null);
-                  }}>Usar este punto</button>
-                </div>
+                  </ul>
+                )}
+              </div>
+              <div style={{ height: '70%' }}>
+                <MapContainer center={[21.5458, -99.6894]} zoom={13} style={{ height: '100%', width: '100%' }}>
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
+                  <CaptureBounds onChange={setModalBounds} onCenter={setModalCenter} />
+                  <PickOnClick onPick={({ lat, lng }) => setPickedCoord(`${lat},${lng}`)} />
+                  {modalResults.map((r, idx) => (
+                    <Marker key={`res-${idx}`} position={[r.lat, r.lng]} icon={L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png', shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41] })} eventHandlers={{ click: () => setPickedCoord(`${r.lat},${r.lng}`) }} />
+                  ))}
+                  <FitToResults results={modalResults} />
+                  {pickedCoord && (() => { const [lat, lng] = pickedCoord.split(',').map(Number); return <Marker position={[lat, lng]} icon={L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png', shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] })} />; })()}
+                </MapContainer>
+              </div>
+              <div className="card-actions" style={{ marginTop: 10 }}>
+                <button className="btn btn-secondary" onClick={() => { setShowModal(false); setPickedCoord(null); setSelectingField(null); }}>Cerrar</button>
+                <button className="btn btn-primary" disabled={!pickedCoord} onClick={() => {
+                  if (selectingField === 'origen') setNueva({ ...nueva, origen: pickedCoord, tipo: 'solicitud', puntoId: null });
+                  if (selectingField === 'destino') setNueva({ ...nueva, destino: pickedCoord });
+                  setShowModal(false); setPickedCoord(null); setSelectingField(null);
+                }}>Usar este punto</button>
               </div>
             </div>
-          )}
-        </section>
+          </div>
+        )}
 
         {msg && <div style={{ marginTop: 12, color: 'var(--color-muted)' }}>{msg}</div>}
         {toast && (

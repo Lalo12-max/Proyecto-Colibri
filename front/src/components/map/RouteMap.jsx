@@ -108,7 +108,7 @@ export function RouteMap({ origen, destino, height = 'clamp(280px, 50vh, 520px)'
   const startCenter = from || to || ARROYO_SECO_CENTER;
 
   return (
-    <div style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
+    <div className="map-wrapper" style={{ border: '1px solid var(--color-border)' }}>
       <MapContainer
         center={[startCenter.lat, startCenter.lng]}
         zoom={13}

@@ -3,7 +3,7 @@ name: CI/CD Despliegue de Servidor Colibri
 on:
   push:
     branches:
-      - main
+      - main # La rama que activa el despliegue
 
 jobs:
   build-and-deploy:
@@ -13,7 +13,9 @@ jobs:
       - name: Checkout del Código
         uses: actions/checkout@v4
 
-      # --- ✔ 1. Pruebas Automatizadas (Integración) ---
+      # ---------------------------------------------
+      # 1. Pruebas Automatizadas (Instalación y Ejecución)
+      # ---------------------------------------------
       - name: Configurar Node.js y Cache
         uses: actions/setup-node@v4
         with:
@@ -24,23 +26,35 @@ jobs:
         run: |
           npm install
           npm test 
-        working-directory: ./servidor 
-        
-      # --- ✔ 2. Construcción de Imágenes y Publicación en Registry ---
+        # CRÍTICO: Asegura que npm encuentre package.json en el subdirectorio 'servidor'
+        working-directory: ./servidor
+        # CRÍTICO: Inyecta las variables de Supabase para que las pruebas se conecten
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          
+      # ---------------------------------------------
+      # 2. Construcción de Imágenes y Publicación en Registry
+      # ---------------------------------------------
       - name: Login a Docker Hub
+        # Versión estable y segura
         uses: docker/login-action@v3 
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build y Push de la Imagen Docker
+        # Nombre correcto de la acción
         uses: docker/build-push-action@v5 
         with:
+          # Contexto apunta al Dockerfile en el subdirectorio
           context: ./servidor
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/colibri-servidor:latest,${{ secrets.DOCKER_USERNAME }}/colibri-servidor:${{ github.sha }}
           
-      # --- ✔ 3. Despliegue Automático en VPS ---
+      # ---------------------------------------------
+      # 3. Despliegue Automático en VPS (con Docker Compose)
+      # ---------------------------------------------
       - name: Despliegue por SSH en AWS VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -49,10 +63,19 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             echo "Iniciando despliegue en el VPS..."
+            
+            # 1. Navegar a la carpeta donde está el docker-compose.yml
             cd ~/Proyecto-Colibri/servidor
+            
+            # 2. Autenticación de Docker en el VPS
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+            
+            # 3. Exportar variables para docker-compose
             export TAG=latest
             export DOCKER_USER=${{ secrets.DOCKER_USERNAME }}
+            
+            # 4. Pull de la nueva imagen y reinicio de la aplicación
             docker-compose pull app 
             docker-compose up -d --no-deps app
+            
             echo "Despliegue finalizado."

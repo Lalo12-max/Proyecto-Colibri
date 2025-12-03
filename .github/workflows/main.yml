@@ -49,6 +49,9 @@ jobs:
         with:
           # Contexto apunta al Dockerfile en el subdirectorio
           context: ./servidor
+          # CORRECCIÓN DE ERROR: Especificamos la ruta y el nombre exacto del Dockerfile
+          # Si tu archivo se llama 'dockerfile' (minúsculas), cambia la D a minúscula aquí.
+          file: ./servidor/Dockerfile # <--- ¡ÚLTIMA CORRECCIÓN PARA EL BUILD!
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/colibri-servidor:latest,${{ secrets.DOCKER_USERNAME }}/colibri-servidor:${{ github.sha }}
           

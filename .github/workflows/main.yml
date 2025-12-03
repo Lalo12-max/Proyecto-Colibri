@@ -1,0 +1,68 @@
+name: CI/CD Despliegue de Servidor Colibri
+
+on:
+  push:
+    branches:
+      - main # O la rama que uses para producción
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout del Código
+        uses: actions/checkout@v4
+
+      # --- ✔ 1. Pruebas Automatizadas (Integración) ---
+      - name: Configurar Node.js y Cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      # Asegúrate de que el script 'test' en tu package.json ejecute las pruebas.
+      - name: Instalar Dependencias y Ejecutar Pruebas
+        run: |
+          npm install
+          npm test 
+          
+      # --- ✔ 2. Construcción de Imágenes y Publicación en Registry ---
+      - name: Login en Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build y Push de la Imagen Docker
+        uses: docker/build-and-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/colibri-servidor:latest,${{ secrets.DOCKER_USERNAME }}/colibri-servidor:${{ github.sha }}
+          # El tag 'latest' y un tag con el SHA (código único) de la commit
+          
+      # --- ✔ 3. Despliegue Automático en VPS ---
+      - name: Despliegue por SSH en AWS VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "Iniciando despliegue en el VPS..."
+            
+            # Navegar al directorio de tu proyecto en el VPS (si es diferente)
+            cd ~/Proyecto-Colibri/servidor
+            
+            # 1. Login en el registry
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+            
+            # 2. Exportar variables para docker-compose.yml
+            export TAG=latest # Usamos el tag 'latest' para el despliegue
+            export DOCKER_USER=${{ secrets.DOCKER_USERNAME }}
+            
+            # 3. Pull de la nueva imagen y reinicio de la aplicación
+            docker-compose pull app 
+            docker-compose up -d --no-deps app
+            
+            echo "Despliegue finalizado."

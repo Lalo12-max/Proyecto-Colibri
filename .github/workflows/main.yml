@@ -1,83 +1,83 @@
 name: CI/CD Despliegue de Servidor Colibri
 
 on:
-  push:
-    branches:
-      - main # La rama que activa el despliegue
+  push:
+    branches:
+      - main # La rama que activa el despliegue
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout del Código
-        uses: actions/checkout@v4
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout del Código
+        uses: actions/checkout@v4
 
-      # ---------------------------------------------
-      # 1. Pruebas Automatizadas (Instalación y Ejecución)
-      # ---------------------------------------------
-      - name: Configurar Node.js y Cache
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          
-      - name: Instalar Dependencias y Ejecutar Pruebas
-        # Usar working-directory para movernos a la carpeta del servidor antes de NPM
-        run: |
-          npm install
-          npm test 
-        working-directory: ./servidor
-        # Inyecta las variables de Supabase
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          
-      # ---------------------------------------------
-      # 2. Construcción de Imágenes y Publicación en Registry
-      # ---------------------------------------------
-      - name: Login a Docker Hub
-        uses: docker/login-action@v3 
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      # ---------------------------------------------
+      # 1. Pruebas Automatizadas (Instalación y Ejecución)
+      # ---------------------------------------------
+      - name: Configurar Node.js y Cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Instalar Dependencias y Ejecutar Pruebas
+        # Usar working-directory para movernos a la carpeta del servidor antes de NPM
+        run: |
+          npm install
+          npm test 
+        working-directory: ./servidor
+        # Inyecta las variables de Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          
+      # ---------------------------------------------
+      # 2. Construcción de Imágenes y Publicación en Registry
+      # ---------------------------------------------
+      - name: Login a Docker Hub
+        uses: docker/login-action@v3 
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build y Push de la Imagen Docker
-        uses: docker/build-push-action@v5 
-        with:
-          # Contexto: La carpeta 'servidor' donde está el código fuente de la app
-          context: ./servidor
-          # Dockerfile: Ubicado dentro de la carpeta 'servidor'
-          file: ./servidor/Dockerfile 
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/colibri-servidor:latest,${{ secrets.DOCKER_USERNAME }}/colibri-servidor:${{ github.sha }}
-          
-      # ---------------------------------------------
-      # 3. Despliegue Automático en VPS (con Docker Compose)
-      # ---------------------------------------------
-      - name: Despliegue por SSH en AWS VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            echo "Iniciando despliegue en el VPS..."
-            
-            # 1. CRÍTICO: Navegar a la carpeta raíz donde está el docker-compose.yml
-            cd ~/Proyecto-Colibri
-            
-            # 2. Autenticación de Docker en el VPS
-            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
-            
-            # 3. Exportar variables de entorno (DOCKER_USER y TAG)
-            export TAG=latest
-            export DOCKER_USER=${{ secrets.DOCKER_USERNAME }}
-            
-            # 4. Pull de la nueva imagen y reinicio de la aplicación
-            # Usa 'up -d' la primera vez para levantar Nginx y App.
-            # Luego, 'up -d --no-deps app' para solo reiniciar la aplicación y no Nginx.
-            docker-compose pull app 
-            docker-compose up -d --no-deps app
-            
-            echo "Despliegue finalizado."
+      - name: Build y Push de la Imagen Docker
+        uses: docker/build-push-action@v5 
+        with:
+          # Contexto: La carpeta 'servidor' donde está el código fuente de la app
+          context: ./servidor
+          # Dockerfile: Ubicado dentro de la carpeta 'servidor'
+          file: ./servidor/Dockerfile 
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/colibri-servidor:latest,${{ secrets.DOCKER_USERNAME }}/colibri-servidor:${{ github.sha }}
+          
+      # ---------------------------------------------
+      # 3. Despliegue Automático en VPS (con Docker Compose)
+      # ---------------------------------------------
+      - name: Despliegue por SSH en AWS VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "Iniciando despliegue en el VPS..."
+            
+            # 1. CRÍTICO: Navegar a la carpeta raíz donde está el docker-compose.yml
+            cd ~/Proyecto-Colibri
+            
+            # 2. Autenticación de Docker en el VPS
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+            
+            # 3. Exportar variables de entorno (DOCKER_USER y TAG)
+            export TAG=latest
+            export DOCKER_USER=${{ secrets.DOCKER_USERNAME }}
+            
+            # 4. Pull de la nueva imagen y reinicio de la aplicación
+            # Usa 'up -d' la primera vez para levantar Nginx y App.
+            # Luego, 'up -d --no-deps app' para solo reiniciar la aplicación y no Nginx.
+            docker-compose pull app 
+            docker-compose up -d --no-deps app
+            
+            echo "Despliegue finalizado."

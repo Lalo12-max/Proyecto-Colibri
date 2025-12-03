@@ -47,11 +47,10 @@ jobs:
         # Nombre correcto de la acción
         uses: docker/build-push-action@v5 
         with:
-          # Contexto apunta al Dockerfile en el subdirectorio
-          context: ./servidor
-          # CORRECCIÓN DE ERROR: Especificamos la ruta y el nombre exacto del Dockerfile
-          # Si tu archivo se llama 'dockerfile' (minúsculas), cambia la D a minúscula aquí.
-          file: ./servidor/Dockerfile # <--- ¡ÚLTIMA CORRECCIÓN PARA EL BUILD!
+          # CORRECCIÓN DE UBICACIÓN: El contexto es la raíz (.), donde está el Dockerfile
+          context: . 
+          # CORRECCIÓN DE UBICACIÓN: Especificamos la ruta del Dockerfile desde la raíz
+          file: ./Dockerfile 
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/colibri-servidor:latest,${{ secrets.DOCKER_USERNAME }}/colibri-servidor:${{ github.sha }}
           
@@ -67,7 +66,7 @@ jobs:
           script: |
             echo "Iniciando despliegue en el VPS..."
             
-            # 1. Navegar a la carpeta donde está el docker-compose.yml
+            # 1. Navegar a la carpeta donde está el docker-compose.yml (servidor)
             cd ~/Proyecto-Colibri/servidor
             
             # 2. Autenticación de Docker en el VPS

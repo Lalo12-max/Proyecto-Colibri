@@ -1,0 +1,30 @@
+
+
+version: '3.8'
+
+services:
+  # 1. SERVICIO DE LA APLICACIÓN (app)
+  app:
+    image: ${DOCKER_USER}/colibri-servidor:${TAG}
+    container_name: colibri-app
+    restart: always
+    expose:
+      - "3000" # Sigue expuesto solo a la red interna
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # ... OTRAS VARIABLES ...
+
+  # 2. SERVICIO DE NGINX (proxy)
+  nginx:
+    image: nginx:stable-alpine
+    container_name: colibri-nginx
+    restart: always
+    # Conecta el puerto 80 del VPS (host) al puerto 80 de este contenedor
+    ports:
+      - "80:80"
+    volumes:
+      # Monta el archivo de configuración que acabas de crear
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app # Asegura que la app inicie antes que Nginx

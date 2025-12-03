@@ -1,5 +1,3 @@
-
-
 FROM node:20-slim
 
 
@@ -7,8 +5,7 @@ FROM node:20-slim
 WORKDIR /app
 
 
-
-COPY ./servidor/package*.json ./
+COPY package*.json ./
 
 
 
@@ -16,13 +13,10 @@ RUN npm install --omit=dev
 
 
 
-COPY ./servidor .
-
+COPY . .
 
 
 EXPOSE 3000
-
-
 
 
 

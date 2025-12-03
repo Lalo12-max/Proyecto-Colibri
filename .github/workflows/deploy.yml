@@ -28,6 +28,7 @@ jobs:
 
       - name: Ejecutar pruebas
         run: npm test
+        working-directory: ./servidor
 
       # ---------------------------
       # 2. Construir y subir imagen docker

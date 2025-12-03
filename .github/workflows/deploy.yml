@@ -39,13 +39,13 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build y push de imagen
-        uses: docker/build-push-action@v4
+      - name: Build y Push de la Imagen Docker
+        uses: docker/build-and-push-action@v5
         with:
-          context: .
-          file: ./Dockerfile
+          # RUTA CORREGIDA:
+          context: ./servidor 
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/colibri-backend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/colibri-servidor:latest,${{ secrets.DOCKER_USERNAME }}/colibri-servidor:${{ github.sha }}
 
       # ---------------------------
       # 3. Deploy automático en VPS vía SSH

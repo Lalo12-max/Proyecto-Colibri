@@ -24,6 +24,6 @@ EXPOSE 3000
 
 
 
-server.js es el archivo que inicia tu servidor Express
+
 
 CMD ["node", "server.js"]

@@ -40,7 +40,7 @@ function MenuPanel({ open, onClose }) {
             <>
               <Link to="/conductor/puntos" className="menu-item" onClick={onClose}><span className="icon">📍</span><span>Mis Puntos</span></Link>
               <Link to="/conductor/mis-viajes" className="menu-item" onClick={onClose}><span className="icon">🧾</span><span>Historial de viajes</span></Link>
-              <Link to="/conductor/solicitudes" className="menu-item" onClick={onClose}><span className="icon">🚀</span><span>Solicitudes (Uber)</span></Link>
+              <Link to="/conductor/solicitudes" className="menu-item" onClick={onClose}><span className="icon">🚀🚀</span><span>Solicitudes (Uber)</span></Link>
               <Link to="/conductor/perfil" className="menu-item" onClick={onClose}><span className="icon">🚗</span><span>Perfil</span></Link>
               <button className="menu-item" onClick={() => { logoutDriver(); onClose?.(); }}><span className="icon">🚪</span><span>Cerrar sesión</span></button>
             </>
